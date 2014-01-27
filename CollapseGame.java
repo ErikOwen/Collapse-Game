@@ -245,6 +245,11 @@ public class CollapseGame
     {
         int centerCol = boardSize / 2;
         
+        /*if(boardSize % 2 == 0)
+        {
+            centerCol--;
+        }*/
+        
         //Shift the cells right of the center to the center if needed
         for(int ndx = centerCol; ndx < boardSize - 1; ndx++)
         {

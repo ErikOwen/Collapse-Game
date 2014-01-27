@@ -27,6 +27,7 @@ public class CollapseConsole
     private final static int kCheet = 5;
     private final static int kQuit = 6;
     private final static int kCharToInt = 65;
+    private final static int kMaxNameLength = 20;
     private int boardNum;
     private CollapseGame game;
     
@@ -73,6 +74,7 @@ public class CollapseConsole
         char[][] board;
         String userInput;
         int userChoice = 0;
+        boolean gameOver = false;
         Scanner scan = new Scanner(rdr);
         
         try
@@ -96,7 +98,11 @@ public class CollapseConsole
                         int column = Integer.parseInt(userInput.substring(1, 2)) - 1;
                         if (row < board.length && column < board[0].length)
                         {
-                            game.takeTurn(row, column);
+                            gameOver = game.takeTurn(row, column);
+                        }
+                        if(gameOver)
+                        {
+                            gameOver(scan);
                         }
                     }
                 }
@@ -111,8 +117,9 @@ public class CollapseConsole
                             game = new CollapseGame(8, this.boardNum);
                         break;
                         case 2:
-                        //Start a new game on this board
-                        
+                            //Start a new game on this board
+                            this.boardNum++;
+                            game = new CollapseGame(8, this.boardNum);
                         break;
                         case 3:
                             //Select a game
@@ -140,6 +147,44 @@ public class CollapseConsole
             e.printStackTrace();
         }
         
+    }
+    
+    private void gameOver(Scanner scan)
+    {
+        String input;
+        String name;
+        try
+        {
+            wtr.write("Game Won Notification: Game " + this.boardNum + " Cleared! \n");
+            wtr.write("Save your score? (y/n)\n");
+            wtr.flush();
+        
+            input = scan.nextLine();
+        
+            if(input.equals("y"))
+            {
+                wtr.write("Name Entry: Your score of 11 will be entered into the Hall of Fame. \n");
+                wtr.write("Enter your name: \n");
+                wtr.flush();
+                
+                name = scan.nextLine();
+            
+                if(name.length() > kMaxNameLength)
+                {
+                    name = name.substring(0, kMaxNameLength + 1);
+                }
+                
+                this.addHighScore(name, this.game.getNumberOfMoves());
+                wtr.write("4\n");
+                wtr.write(getHighScores());
+                wtr.write("2\n");
+                wtr.flush();
+            }
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
     }
     
     private void selectGame(Scanner scan)
@@ -266,8 +311,9 @@ public class CollapseConsole
             for(int scoreNdx = 0; scoreNdx < kHallSize && scoreNdx < scoresList.size(); scoreNdx++)
             {
                 HighScore curScore = scoresList.get(scoreNdx);
-                highScoresString = highScoresString.concat(curScore.getScore() + " " + curScore.getName() + "\n");
+                highScoresString = highScoresString.concat("         " + curScore.getScore() + "    " + curScore.getName() + "\n");
             }
+            highScoresString = highScoresString.concat("\n");
         }
         catch(Exception e)
         {
@@ -285,7 +331,7 @@ public class CollapseConsole
     public String getHighScores()
     {
         File highScoresFile = new File(kHallOfFamePath);
-        String highScoresString = "Hall of Fame not found: collapse/halloffame.ser.";
+        String highScoresString = "";
         
         try
         {
