@@ -10,9 +10,11 @@ public class CollapseGame
 {
     private CollapsePiece[][] tileBoard;
     private char[][] characterBoard;
+    private CollapsePiece[][] savedTileBoard;
+    private char[][] savedCharacterBoard;
     private int boardSize;
-    private int tilesLeft;
     private int numMoves;
+    boolean isCheating;
 
     /**
      * Constructor for objects of class CollapseGame
@@ -22,8 +24,10 @@ public class CollapseGame
         this.boardSize = dimension;
         this.tileBoard = new CollapsePiece[boardSize][boardSize];
         this.characterBoard = new char[boardSize][boardSize];
-        this.tilesLeft = dimension * dimension;
+        this.savedTileBoard = new CollapsePiece[boardSize][boardSize];
+        this.savedCharacterBoard = new char[boardSize][boardSize];
         this.numMoves = 0;
+        this.isCheating = false;
         
         this.generateBoard(boardNumber);
     }
@@ -133,7 +137,19 @@ public class CollapseGame
      */
     public int getTilesLeft()
     {
-        return this.tilesLeft;
+        int tilesLeft = 0;
+        
+        for (int rowIter = 0; rowIter < tileBoard.length; rowIter++)
+        {
+            for(int colIter = 0; colIter < tileBoard[0].length; colIter++)
+            {
+                if(tileBoard[rowIter][colIter] != CollapsePiece.empty)
+                {
+                    tilesLeft++;
+                }
+            }
+        }
+        return tilesLeft;
     }
     
     /**
@@ -186,7 +202,7 @@ public class CollapseGame
         {
             curSpot = queue.remove();
             
-            if(curSpot.getRowCoordinate() < tileBoard.length -1 && tileBoard[curSpot.getRowCoordinate() + 1][curSpot.getColumnCoordinate()] == curColor)
+            if(curSpot.getRowCoordinate() < tileBoard.length - 1 && tileBoard[curSpot.getRowCoordinate() + 1][curSpot.getColumnCoordinate()] == curColor)
             {
                 queue.add(new TileCoordinates(curSpot.getRowCoordinate() + 1, curSpot.getColumnCoordinate()));
             }
@@ -205,7 +221,6 @@ public class CollapseGame
             
             tileBoard[curSpot.getRowCoordinate()][curSpot.getColumnCoordinate()] = CollapsePiece.empty;
             characterBoard[curSpot.getRowCoordinate()][curSpot.getColumnCoordinate()] = ' ';
-            tilesLeft--;
         }
     }
     
@@ -317,5 +332,47 @@ public class CollapseGame
         }
         
         return isEmpty;
+    }
+    
+    /**
+     * Allows the player to cheat by removing the majority of the board
+     */
+    public void cheat()
+    {
+        if(!isCheating)
+        {
+            //Save both the boards in case if player undoes cheat
+            for (int rowIter = 0; rowIter < tileBoard.length; rowIter++)
+            {
+                for(int colIter = 0; colIter < tileBoard[0].length; colIter++)
+                {
+                    savedTileBoard[rowIter][colIter] = tileBoard[rowIter][colIter];
+                    savedCharacterBoard[rowIter][colIter] = characterBoard[rowIter][colIter];
+                
+                    tileBoard[rowIter][colIter] = CollapsePiece.empty;
+                    characterBoard[rowIter][colIter] = ' ';
+                }
+            }
+        
+            tileBoard[0][0] = CollapsePiece.green;
+            characterBoard[0][0] = 'G';
+            tileBoard[0][1] = CollapsePiece.green;
+            characterBoard[0][1] = 'G';
+        
+            isCheating = true;
+        }
+        else
+        {
+            for (int rowIter = 0; rowIter < tileBoard.length; rowIter++)
+            {
+                for(int colIter = 0; colIter < tileBoard[0].length; colIter++)
+                {
+                    tileBoard[rowIter][colIter] = savedTileBoard[rowIter][colIter];
+                    characterBoard[rowIter][colIter] = savedCharacterBoard[rowIter][colIter];
+                }
+            }
+            
+            isCheating = false;
+        }
     }
 }

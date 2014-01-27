@@ -132,6 +132,7 @@ public class CollapseConsole
                         break;
                         case 5:
                             //cheat
+                            game.cheat();
                         
                         break;
                         case 6:
