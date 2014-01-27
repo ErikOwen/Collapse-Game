@@ -82,8 +82,6 @@ public class CollapseConsole
             while(userChoice != kQuit)
             {
                 board = game.getCharacterBoard();
-                wtr.write("Collapse - board " + this.boardNum + "\n");
-                wtr.write("Tiles left: " + game.getTilesLeft() + "    Moves: " + game.getNumberOfMoves() + "  \n");
                 displayBoard(game, board);
                 wtr.write("1)Restart 2)New Game 3)Select Game 4)Scores 5)Cheat 6)Quit \n");
                 wtr.flush();
@@ -102,7 +100,10 @@ public class CollapseConsole
                         }
                         if(gameOver)
                         {
+                            displayBoard(game, board);
                             gameOver(scan);
+                            this.boardNum++;
+                            game = new CollapseGame(8, this.boardNum);
                         }
                     }
                 }
@@ -215,6 +216,8 @@ public class CollapseConsole
     {
         try
         {
+            wtr.write("Collapse - board " + this.boardNum + "\n");
+            wtr.write("Tiles left: " + game.getTilesLeft() + "    Moves: " + game.getNumberOfMoves() + "  \n");
             String colString = "     ";
             for(int colIter = 1; colIter <= board[0].length; colIter++)
             {

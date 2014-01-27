@@ -245,34 +245,9 @@ public class CollapseGame
     {
         int centerCol = boardSize / 2;
         
-        /*if(boardSize % 2 == 0)
+        if(boardSize % 2 == 0)
         {
             centerCol--;
-        }*/
-        
-        //Shift the cells right of the center to the center if needed
-        for(int ndx = centerCol; ndx < boardSize - 1; ndx++)
-        {
-            if(columnIsEmpty(ndx))
-            {
-                int curCol = ndx + 1;
-                while(curCol < boardSize && columnIsEmpty(curCol))
-                {
-                    curCol++;
-                }
-                
-                if(curCol < boardSize)
-                {
-                    for(int rowIter = 0; rowIter < tileBoard.length; rowIter++)
-                    {
-                        tileBoard[rowIter][ndx] = tileBoard[rowIter][curCol];
-                        tileBoard[rowIter][curCol] = CollapsePiece.empty;
-                        
-                        characterBoard[rowIter][ndx] = characterBoard[rowIter][curCol];
-                        characterBoard[rowIter][curCol] = ' ';
-                    }
-                }
-            }
         }
         
         //Shift the cells left of the center to the center, if needed
@@ -300,7 +275,30 @@ public class CollapseGame
             }
         }
         
-
+        //Shift the cells right of the center to the center if needed
+        for(int ndx = centerCol; ndx < boardSize - 1; ndx++)
+        {
+            if(columnIsEmpty(ndx))
+            {
+                int curCol = ndx + 1;
+                while(curCol < boardSize && columnIsEmpty(curCol))
+                {
+                    curCol++;
+                }
+                
+                if(curCol < boardSize)
+                {
+                    for(int rowIter = 0; rowIter < tileBoard.length; rowIter++)
+                    {
+                        tileBoard[rowIter][ndx] = tileBoard[rowIter][curCol];
+                        tileBoard[rowIter][curCol] = CollapsePiece.empty;
+                        
+                        characterBoard[rowIter][ndx] = characterBoard[rowIter][curCol];
+                        characterBoard[rowIter][curCol] = ' ';
+                    }
+                }
+            }
+        }
     }
     
     /**
