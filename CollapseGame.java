@@ -11,6 +11,8 @@ public class CollapseGame
     private CollapsePiece[][] tileBoard;
     private char[][] characterBoard;
     private int boardSize;
+    private int tilesLeft;
+    private int numMoves;
 
     /**
      * Constructor for objects of class CollapseGame
@@ -20,6 +22,8 @@ public class CollapseGame
         this.boardSize = dimension;
         this.tileBoard = new CollapsePiece[boardSize][boardSize];
         this.characterBoard = new char[boardSize][boardSize];
+        this.tilesLeft = dimension * dimension;
+        this.numMoves = 0;
         
         this.generateBoard(boardNumber);
     }
@@ -112,14 +116,32 @@ public class CollapseGame
             {
                 //Removes cell and all adjacent tiles of the same color
                 removeSelection(rowPos, colPos);
+                //Shifts the necesssary cells downwards to fill in blank spots
+                shiftCellsDownwards();
+                //Shifts the columns to the center if there are any empty columns on the board
+                shiftColumnsToCenter();
             }
-            //Shifts the necesssary cells downwards to fill in blank spots
-            //shiftCellsDownwards();
-            //Shifts the columns to the center if there are any empty columns on the board
-            //shiftColumnsToCenter();
+            
+            numMoves++;
         }
         
         return isGameOver();
+    }
+    
+    /**
+     * Returns the number of tiles left the player needs to clear
+     */
+    public int getTilesLeft()
+    {
+        return this.tilesLeft;
+    }
+    
+    /**
+     * Returns the number of moves the play has made
+     */
+    public int getNumberOfMoves()
+    {
+        return this.numMoves;
     }
     
     /**
@@ -183,6 +205,7 @@ public class CollapseGame
             
             tileBoard[curSpot.getRowCoordinate()][curSpot.getColumnCoordinate()] = CollapsePiece.empty;
             characterBoard[curSpot.getRowCoordinate()][curSpot.getColumnCoordinate()] = ' ';
+            tilesLeft--;
         }
     }
     
@@ -198,12 +221,12 @@ public class CollapseGame
                 if(tileBoard[rowIter][colIter] != CollapsePiece.empty && tileBoard[rowIter + 1][colIter] == CollapsePiece.empty)
                 {
                     int curSpot = rowIter + 1;
-                    while(tileBoard[curSpot][colIter] == CollapsePiece.empty && curSpot < tileBoard.length - 1)
+                    while(curSpot < tileBoard.length - 1 && tileBoard[curSpot + 1][colIter] == CollapsePiece.empty)
                     {
                         curSpot++;
                     }
                     
-                    //Shift the current cell down one
+                    
                     tileBoard[curSpot][colIter] = tileBoard[rowIter][colIter];
                     tileBoard[rowIter][colIter] = CollapsePiece.empty;
                     
@@ -228,7 +251,7 @@ public class CollapseGame
             if(columnIsEmpty(ndx))
             {
                 int curCol = ndx + 1;
-                while(columnIsEmpty(curCol) && curCol < boardSize)
+                while(curCol < boardSize && columnIsEmpty(curCol))
                 {
                     curCol++;
                 }
@@ -253,7 +276,7 @@ public class CollapseGame
             if(columnIsEmpty(ndx))
             {
                 int curCol = ndx - 1;
-                while(columnIsEmpty(curCol) && curCol >= 0)
+                while(curCol >= 0 && columnIsEmpty(curCol))
                 {
                     curCol--;
                 }

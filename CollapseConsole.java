@@ -28,6 +28,7 @@ public class CollapseConsole
     private final static int kQuit = 6;
     private final static int kCharToInt = 65;
     private int boardNum;
+    private CollapseGame game;
     
     /** Entry point for the application.
      *
@@ -38,6 +39,8 @@ public class CollapseConsole
         CollapseConsole app = new CollapseConsole(); 
         app.setIOsources(new InputStreamReader(System.in), 
                          new OutputStreamWriter(System.out));
+                         
+                         
         app.run();
     }
 
@@ -66,7 +69,7 @@ public class CollapseConsole
      */
     public void run()
     {
-        CollapseGame game = new CollapseGame(8, this.boardNum);
+        this.game = new CollapseGame(5, this.boardNum);
         char[][] board;
         String userInput;
         int userChoice = 0;
@@ -78,7 +81,7 @@ public class CollapseConsole
             {
                 board = game.getCharacterBoard();
                 wtr.write("Collapse - board " + this.boardNum + "\n");
-                wtr.write("Tiles left: 64    Moves: 0  \n");
+                wtr.write("Tiles left: " + game.getTilesLeft() + "    Moves: " + game.getNumberOfMoves() + "  \n");
                 displayBoard(game, board);
                 wtr.write("1)Restart 2)New Game 3)Select Game 4)Scores 5)Cheat 6)Quit \n");
                 wtr.flush();
@@ -113,7 +116,7 @@ public class CollapseConsole
                         break;
                         case 3:
                             //Select a game
-                        
+                            selectGame(scan);
                         break;
                         case 4:
                             //View high scores
@@ -125,10 +128,35 @@ public class CollapseConsole
                         break;
                         case 6:
                             //exit
+                            scan.close();
                             System.exit(0);
                         break;
                 }
                 }
+            }
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+        
+    }
+    
+    private void selectGame(Scanner scan)
+    {
+        String boardNumberString;
+        int boardNumber;
+        try
+        {
+            wtr.write("Select Game: Enter desired game number (1 - 5000):\n");
+            wtr.flush();
+            boardNumberString = scan.nextLine();
+            boardNumber = Integer.parseInt(boardNumberString);
+            
+            if(boardNumber > 0 && boardNumber < kNumBoards)
+            {
+                this.game = new CollapseGame(8, boardNumber);
+                this.boardNum = boardNumber;
             }
         }
         catch(IOException e)
