@@ -1,0 +1,12 @@
+#BlueJ class context
+comment0.target=GUIskeleton()
+comment0.text=Create\ a\ GUI.\nWill\ use\ the\ System\ Look\ and\ Feel\ when\ possible.\n\n
+comment1.target=void\ layoutGUI()
+comment1.text=Place\ all\ the\ Swing\ widgets\ in\ the\ frame\ of\ this\ GUI.\n@post\ the\ GUI\ is\ visible.\ \ \n\n
+comment2.target=void\ restart()
+comment3.target=void\ loadImages()
+comment4.target=void\ newGame()
+comment4.text=Start\ a\ new\ game\ by\ putting\ new\ values\ in\ the\ board\ \n
+comment5.params=args
+comment5.target=void\ main(String[])
+numComments=6

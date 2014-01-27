@@ -1,0 +1,6 @@
+#BlueJ class context
+comment0.target=CollapseConsoleTest()
+comment0.text=\nDefault\ constructor\ for\ test\ class\ CollapseConsoleTest\n\n
+comment1.target=void\ testHighScores()
+comment1.text=\nTests\ the\ highscores\ functionality\n\n
+numComments=2

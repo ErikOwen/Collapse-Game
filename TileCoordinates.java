@@ -1,0 +1,41 @@
+
+/**
+ * This class represents the coordinates on the board for a tile
+ * 
+ * @author Erik Owen
+ * @version 1
+ */
+public class TileCoordinates
+{
+    private int rowCoord;
+    private int colCoord;
+
+    /**
+     * Constructor for objects of class TileCoordinates
+     */
+    public TileCoordinates(int row, int col)
+    {
+        this.rowCoord = row;
+        this.colCoord = col;
+    }
+
+    /**
+     * Accessor method for x-coordinate
+     * 
+     * @return the x-coordinate
+     */
+    public int getRowCoordinate()
+    {
+        return this.rowCoord;
+    }
+    
+    /**
+     * Accessor method for y-coordinate
+     * 
+     * @return the y-coordinate
+     */
+    public int getColumnCoordinate()
+    {
+        return this.colCoord;
+    }
+}

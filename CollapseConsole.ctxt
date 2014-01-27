@@ -1,0 +1,21 @@
+#BlueJ class context
+comment0.params=args
+comment0.target=void\ main(String[])
+comment0.text=Entry\ point\ for\ the\ application.\n\n@param\ args\ ignored\ \ \ \ \ \n\n
+comment1.target=CollapseConsole()
+comment1.text=Construct\ a\ new\ instance\ of\ this\ class.\nCreate\ the\ game\ components\ and\ initialize\ them,\ncreate\ the\ user\ interface\ and\ connect\ it\ to\ the\ game.\n\n
+comment2.params=rdr\ wtr
+comment2.target=void\ setIOsources(Reader,\ Writer)
+comment2.text=Set\ input/output\ sources\ for\ Stream-based\ user\ interfaces.\n@param\ rdr\ A\ Reader\ from\ which\ user\ input\ is\ obtained.\n@param\ wtr\ A\ Writer\ to\ which\ program\ output\ is\ displayed.\n\n
+comment3.target=void\ run()
+comment3.text=Run\ the\ console\ user\ interface,\ using\ the\ i/o\ streams\ provided\ by\nsetIOsources();\n@pre\ setIOsources()\ has\ been\ called.\n\n
+comment4.params=game\ board
+comment4.target=void\ displayBoard(CollapseGame,\ char[][])
+comment5.params=name\ score
+comment5.target=void\ addHighScore(String,\ int)
+comment5.text=Adds\ a\ new\ high\ score\ to\ the\ high\ scores\ file\n\n@param\ name\ The\ name\ of\ the\ score\ with\ the\ high\ score\n@param\ score\ The\ score\ the\ player\ receieved\n\n
+comment6.params=highScoresFile
+comment6.target=String\ parseAndSortHighScores(File)
+comment7.target=String\ getHighScores()
+comment7.text=Return\ a\ string\ representation\ of\ the\ top\ five\ high\ scores.\ \n@return\ string\ is\ the\ top\ scores,\ one\ per\ line,\ with\ the\nscore\ and\ name\ (in\ that\ order),\ separated\ by\ one\ or\ more\ blanks.\nName\ is\ twenty\ characters\ max.\ \ Leading\ blanks\ are\ allowed.\n\n
+numComments=8

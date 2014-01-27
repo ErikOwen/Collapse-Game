@@ -1,0 +1,9 @@
+#BlueJ class context
+comment0.params=row\ col
+comment0.target=TileCoordinates(int,\ int)
+comment0.text=\nConstructor\ for\ objects\ of\ class\ TileCoordinates\n\n
+comment1.target=int\ getRowCoordinate()
+comment1.text=\nAccessor\ method\ for\ x-coordinate\n\n@return\ the\ x-coordinate\n\n
+comment2.target=int\ getColumnCoordinate()
+comment2.text=\nAccessor\ method\ for\ y-coordinate\n\n@return\ the\ y-coordinate\n\n
+numComments=3

@@ -1,0 +1,9 @@
+#BlueJ class context
+comment0.params=score\ name
+comment0.target=HighScore(int,\ String)
+comment0.text=\nConstructor\ for\ objects\ of\ class\ HighScore\n\n
+comment1.target=int\ getScore()
+comment1.text=\nAccessor\ method\ for\ getting\ a\ highscore.\n\n@return\ \ the\ score\ of\ this\ highscore\n\n
+comment2.target=String\ getName()
+comment2.text=\nAccessor\ method\ for\ getting\ the\ name\ associated\ with\ a\ highscore.\n\n@return\ the\ name\ of\ this\ highscore\n\n
+numComments=3
