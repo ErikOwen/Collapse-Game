@@ -69,7 +69,7 @@ public class CollapseConsole
      */
     public void run()
     {
-        this.game = new CollapseGame(5, this.boardNum);
+        this.game = new CollapseGame(8, this.boardNum);
         char[][] board;
         String userInput;
         int userChoice = 0;
@@ -108,7 +108,7 @@ public class CollapseConsole
                     {
                         case 1:
                             //restart the game
-                        
+                            game = new CollapseGame(8, this.boardNum);
                         break;
                         case 2:
                         //Start a new game on this board
