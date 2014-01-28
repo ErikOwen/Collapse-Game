@@ -82,13 +82,14 @@ public class CollapseConsole
         boolean gameOver = false;
         Scanner scan = new Scanner(rdr);
         
-        try
-        {
+        //try
+        //{
             //board = game.getCharacterBoard();
             displayBoardAndOptions(game/*, board*/);
             
             while(userChoice != kQuit)
-            {   
+            {   try
+                {
                 userInput = scan.nextLine();
                 
                 if(Character.isLetter(userInput.charAt(0)) && userInput.length() == 2)
@@ -104,8 +105,8 @@ public class CollapseConsole
                         
                         if(gameOver)
                         {
-                            gameOver(scan);
-                            this.boardNum++;
+                            gameOver(scan, game);
+                            //this.boardNum++;
                             game = new CollapseGame(boardPrefSize, this.boardNum);
                         }
                     }
@@ -152,15 +153,18 @@ public class CollapseConsole
                     }
                 }
             }
+            catch(Exception e) {
+                userChoice = 0;
+            }
         }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
+        //catch(IOException e)
+        //{
+            //e.printStackTrace();
+        //}
         
     }
     
-    private void gameOver(Scanner scan)
+    private void gameOver(Scanner scan, CollapseGame game)
     {
         String input;
         String name;
@@ -174,7 +178,7 @@ public class CollapseConsole
         
             if(input.equals("y"))
             {
-                wtr.write("Name Entry: Your score of 11 will be entered into the Hall of Fame. \n");
+                wtr.write("Name Entry: Your score of " + game.getNumberOfMoves() + " will be entered into the Hall of Fame. \n");
                 wtr.write("Enter your name: \n");
                 wtr.flush();
                 
@@ -242,7 +246,11 @@ public class CollapseConsole
                 
                 for(int colIter = 0; colIter < board[0].length; colIter++)
                 {
-                    curRow = curRow.concat(board[rowIter][colIter] + "  ");
+                    curRow = curRow.concat(new Character(board[rowIter][colIter]).toString());
+                    if(colIter < board[0].length - 1)
+                    {
+                        curRow = curRow.concat("  ");
+                    }
                 }
                 
                 curRow = curRow.concat("\n");
@@ -323,7 +331,8 @@ public class CollapseConsole
             for(int scoreNdx = 0; scoreNdx < kHallSize && scoreNdx < scoresList.size(); scoreNdx++)
             {
                 HighScore curScore = scoresList.get(scoreNdx);
-                highScoresString = highScoresString.concat("         " + curScore.getScore() + "    " + curScore.getName() + "\n");
+                //highScoresString = highScoresString.concat("         " + curScore.getScore() + "    " + curScore.getName() + "\n");
+                highScoresString = highScoresString.concat(String.format("%10s", curScore.getScore()) + "    " + curScore.getName() + "\n");
             }
             highScoresString = highScoresString.concat("\n");
         }
