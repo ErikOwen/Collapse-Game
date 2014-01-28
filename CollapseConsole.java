@@ -211,7 +211,7 @@ public class CollapseConsole
             
             if(boardNumber > 0 && boardNumber < kNumBoards)
             {
-                this.game = new CollapseGame(8, boardNumber);
+                this.game = new CollapseGame(this.boardPrefSize, boardNumber);
                 this.boardNum = boardNumber;
             }
         }
@@ -228,13 +228,14 @@ public class CollapseConsole
         {
             char[][] board = game.getCharacterBoard();
             wtr.write("Collapse - board " + this.boardNum + "\n");
-            wtr.write("Tiles left: " + game.getTilesLeft() + "    Moves: " + game.getNumberOfMoves() + "  \n");
+            wtr.write("Tiles left: " + game.getTilesLeft() + "    Moves: " + game.getNumberOfMoves() + "\n");
             String colString = "     ";
-            for(int colIter = 1; colIter <= board[0].length; colIter++)
+            for(int colIter = 1; colIter < board[0].length; colIter++)
             {
                 colString = colString.concat(colIter + "  ");
             }
-            colString = colString.concat("\n");
+            colString = colString.concat(board[0].length + "\n");
+            //colString = colString.concat("\n");
             wtr.write(colString);
         
             char curLetter = 'A';
