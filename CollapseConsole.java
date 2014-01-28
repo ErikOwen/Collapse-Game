@@ -12,8 +12,8 @@ import org.ini4j.*;
  */
 public class CollapseConsole
 {
-    private static InputStreamReader rdr;
-    private static OutputStreamWriter wtr;
+    private static InputStreamReader reader;
+    private static OutputStreamWriter writer;
     /*How many hall of fame entries to return */
     public final static int kHallSize = 5;
     /*Path to high scores directory*/
@@ -40,20 +40,25 @@ public class CollapseConsole
      *  @param args ignored     
      */
     public static void main(String[] args)
-    {   
-        CollapseConsole app = new CollapseConsole(); 
-        app.setIOsources(new InputStreamReader(System.in), 
+    {                   
+        try
+        {
+            CollapseConsole app = new CollapseConsole(); 
+            app.setIOsources(new InputStreamReader(System.in), 
                          new OutputStreamWriter(System.out));
-                         
-                         
-        app.run();
+            app.run();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     /** Construct a new instance of this class.
      * Create the game components and initialize them,
      * create the user interface and connect it to the game.
      */
-    public CollapseConsole()
+    public CollapseConsole() throws IOException
     {
         this.boardNum = new Random().nextInt(kNumBoards);
         this.boardPrefSize = getPreferenceSize();
@@ -65,217 +70,195 @@ public class CollapseConsole
      */
     public void setIOsources(Reader rdr, Writer wtr) 
     {
-        this.rdr = (InputStreamReader)rdr;
-        this.wtr = (OutputStreamWriter)wtr;
+        this.reader = (InputStreamReader)rdr;
+        this.writer = (OutputStreamWriter)wtr;
     }
 
     /** Run the console user interface, using the i/o streams provided by
      *  setIOsources();
      *  @pre setIOsources() has been called.
      */
-    public void run()
+    public void run() throws IOException
     {
         this.game = new CollapseGame(this.boardPrefSize, this.boardNum);
-        //char[][] board;
         String userInput;
         int userChoice = 0;
         boolean gameOver = false;
-        Scanner scan = new Scanner(rdr);
+        Scanner scan = new Scanner(reader);
+
+        displayBoardAndOptions();
         
-        //try
-        //{
-            //board = game.getCharacterBoard();
-            displayBoardAndOptions(game/*, board*/);
-            
-            while(userChoice != kQuit)
-            {   try
-                {
+        /*Keep accepting user input until the user's choice is to quit*/
+        while(userChoice != kQuit)
+        {   
+            try
+            {
                 userInput = scan.nextLine();
                 
+                /*Determines if the user enters the correct format for choosing a tile*/
                 if(Character.isLetter(userInput.charAt(0)) && userInput.length() == 2)
                 {
 
-                    int row = userInput.substring(0, 1).toUpperCase().charAt(0) - kCharToInt;
+                    int row = userInput.substring(0, 1)
+                        .toUpperCase().charAt(0) - kCharToInt;
                     int column = Integer.parseInt(userInput.substring(1, 2)) - 1;
                     
-                    if (row < boardPrefSize && column < boardPrefSize && !game.cellEmpty(row, column))
+                    /*Determines if the chosen spot is a valid spot on the board*/
+                    if (row < boardPrefSize && column <
+                        boardPrefSize && !game.cellEmpty(row, column))
                     {
                         gameOver = game.takeTurn(row, column);
-                        displayBoardAndOptions(game);
+                        displayBoardAndOptions();
                         
+                        /*If the game is over then ask if user wants to enter high score*/
                         if(gameOver)
                         {
                             gameOver(scan, game);
-                            //this.boardNum++;
-                            game = new CollapseGame(boardPrefSize, this.boardNum);
+                            //this.game = new CollapseGame(boardPrefSize, this.boardNum);
                         }
                     }
                 }
                 else
                 {
                     userChoice = Integer.parseInt(userInput);
-                    
-                    switch(userChoice)
-                    {
-                        case 1:
-                            //restart the game
-                            game = new CollapseGame(boardPrefSize, this.boardNum);
-                            displayBoardAndOptions(game);
-                        break;
-                        case 2:
-                            //Start a new game on this board
-                            this.boardNum++;
-                            game = new CollapseGame(boardPrefSize, this.boardNum);
-                            displayBoardAndOptions(game/*, board*/);
-                        break;
-                        case 3:
-                            //Select a game
-                            selectGame(scan);
-                            displayBoardAndOptions(game/*, board*/);
-                        break;
-                        case 4:
-                            //View high scores
-                            wtr.write(getHighScores());
-                            wtr.flush();
-                        
-                        break;
-                        case 5:
-                            //cheat
-                            game.cheat();
-                            displayBoardAndOptions(game);
-                        
-                        break;
-                        case 6:
-                            //exit
-                            scan.close();
-                            System.exit(0);
-                        break;
-                    }
+                    executeCommand(scan, userChoice);
                 }
             }
             catch(Exception e) {
                 userChoice = 0;
             }
         }
-        //catch(IOException e)
-        //{
-            //e.printStackTrace();
-        //}
         
     }
     
-    private void gameOver(Scanner scan, CollapseGame game)
+    private void executeCommand(Scanner scan, int userChoice) throws IOException
+    {
+        switch(userChoice)
+        {
+            case 1:
+                //restart the game
+                this.game = new CollapseGame(this.boardPrefSize, this.boardNum);
+                displayBoardAndOptions();
+                break;
+            case 2:
+                //Start a new game on this board
+                this.boardNum++;
+                this.game = new CollapseGame(this.boardPrefSize, this.boardNum);
+                displayBoardAndOptions();
+                break;
+            case 3:
+                //Select a game
+                selectGame(scan);
+                displayBoardAndOptions();
+                break;
+            case 4:
+                //View high scores
+                writer.write(getHighScores());
+                writer.flush();           
+                break;
+            case 5:
+                //cheat
+                this.game.cheat();
+                displayBoardAndOptions();
+                break;
+            case 6:
+                //exit
+                scan.close();
+                System.exit(0);
+                break;
+        }
+    }
+    
+    private void gameOver(Scanner scan, CollapseGame game) throws IOException
     {
         String input;
         String name;
-        try
+
+        writer.write("Game Won Notification: Game " + this.boardNum + " Cleared! \n");
+        writer.write("Save your score? (y/n)\n");
+        writer.flush();
+        
+        input = scan.nextLine();
+        
+        if(input.equals("y"))
         {
-            wtr.write("Game Won Notification: Game " + this.boardNum + " Cleared! \n");
-            wtr.write("Save your score? (y/n)\n");
-            wtr.flush();
-        
-            input = scan.nextLine();
-        
-            if(input.equals("y"))
-            {
-                wtr.write("Name Entry: Your score of " + game.getNumberOfMoves() + " will be entered into the Hall of Fame. \n");
-                wtr.write("Enter your name: \n");
-                wtr.flush();
+            writer.write("Name Entry: Your score of " + game.getNumberOfMoves() + " will be entered into the Hall of Fame. \n");
+            writer.write("Enter your name: \n");
+            writer.flush();
                 
-                name = scan.nextLine();
+            name = scan.nextLine();
             
-                if(name.length() > kMaxNameLength)
-                {
-                    name = name.substring(0, kMaxNameLength);
-                }
-                
-                this.addHighScore(name, this.game.getNumberOfMoves());
+            if(name.length() > kMaxNameLength)
+            {
+                name = name.substring(0, kMaxNameLength);
             }
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
+                
+            this.addHighScore(name, this.game.getNumberOfMoves());
         }
     }
     
-    private void selectGame(Scanner scan)
+    private void selectGame(Scanner scan) throws IOException
     {
         String boardNumberString;
         int boardNumber;
-        try
-        {
-            wtr.write("Select Game: Enter desired game number (1 - 5000):\n");
-            wtr.flush();
-            boardNumberString = scan.nextLine();
-            boardNumber = Integer.parseInt(boardNumberString);
+
+        writer.write("Select Game: Enter desired game number (1 - 5000):\n");
+        writer.flush();
+        boardNumberString = scan.nextLine();
+        boardNumber = Integer.parseInt(boardNumberString);
             
-            if(boardNumber > 0 && boardNumber < kNumBoards)
-            {
-                this.game = new CollapseGame(this.boardPrefSize, boardNumber);
-                this.boardNum = boardNumber;
-            }
-        }
-        catch(IOException e)
+        if(boardNumber > 0 && boardNumber < kNumBoards)
         {
-            e.printStackTrace();
+            this.game = new CollapseGame(this.boardPrefSize, boardNumber);
+            this.boardNum = boardNumber;
         }
-        
     }
     
-    private void displayBoardAndOptions(CollapseGame game/*, char[][] board*/)
+    private void displayBoardAndOptions() throws IOException
     {
-        try
+        char[][] board = game.getCharacterBoard();
+        writer.write("Collapse - board " + this.boardNum + "\n");
+        writer.write("Tiles left: " + game.getTilesLeft() + "    Moves: " + game.getNumberOfMoves() + "\n");
+        String colString = "     ";
+        for(int colIter = 1; colIter < board[0].length; colIter++)
         {
-            char[][] board = game.getCharacterBoard();
-            wtr.write("Collapse - board " + this.boardNum + "\n");
-            wtr.write("Tiles left: " + game.getTilesLeft() + "    Moves: " + game.getNumberOfMoves() + "\n");
-            String colString = "     ";
-            for(int colIter = 1; colIter < board[0].length; colIter++)
-            {
-                colString = colString.concat(colIter + "  ");
-            }
-            colString = colString.concat(board[0].length + "\n");
-            //colString = colString.concat("\n");
-            wtr.write(colString);
+            colString = colString.concat(colIter + "  ");
+        }
+        colString = colString.concat(board[0].length + "\n");
+        writer.write(colString);
         
-            char curLetter = 'A';
-            String curRow = "";
+        char curLetter = 'A';
+        String curRow = "";
             
-            for(int rowIter = 0; rowIter < board.length; rowIter++, curLetter++)
-            {
-                curRow = curRow.concat(" " + curLetter + ":  ");
-                
-                for(int colIter = 0; colIter < board[0].length; colIter++)
-                {
-                    curRow = curRow.concat(new Character(board[rowIter][colIter]).toString());
-                    if(colIter < board[0].length - 1)
-                    {
-                        curRow = curRow.concat("  ");
-                    }
-                }
-                
-                curRow = curRow.concat("\n");
-                wtr.write(curRow);
-                curRow = "";
-                
-            }
-            
-            String dashedLine = " ----";
-            for(int dashNdx = 0; dashNdx < board[0].length - 1; dashNdx++)
-            {
-                dashedLine = dashedLine.concat("---");
-            }
-            
-            dashedLine = dashedLine.concat("-\n");
-            wtr.write(dashedLine);
-            wtr.write("1)Restart 2)New Game 3)Select Game 4)Scores 5)Cheat 6)Quit \n");
-            wtr.flush();
-            
-        }
-        catch(IOException e)
+        for(int rowIter = 0; rowIter < board.length; rowIter++, curLetter++)
         {
-            e.printStackTrace();
+            curRow = curRow.concat(" " + curLetter + ":  ");
+                
+            for(int colIter = 0; colIter < board[0].length; colIter++)
+            {
+                curRow = curRow.concat(new Character(board[rowIter][colIter]).toString());
+                if(colIter < board[0].length - 1)
+                {
+                    curRow = curRow.concat("  ");
+                }
+            }
+                
+            curRow = curRow.concat("\n");
+            writer.write(curRow);
+            curRow = "";
+                
         }
+            
+        String dashedLine = " ----";
+        for(int dashNdx = 0; dashNdx < board[0].length - 1; dashNdx++)
+        {
+            dashedLine = dashedLine.concat("---");
+        }
+            
+        dashedLine = dashedLine.concat("-\n");
+        writer.write(dashedLine);
+        writer.write("1)Restart 2)New Game 3)Select Game 4)Scores 5)Cheat 6)Quit \n");
+        writer.flush();
     }
 
     /** Adds a new high score to the high scores file
@@ -283,64 +266,50 @@ public class CollapseConsole
      * @param name The name of the score with the high score
      * @param score The score the player receieved
      */
-    protected void addHighScore(String name, int score)
+    protected void addHighScore(String name, int score) throws IOException
     {
         File highScoresDirectory = new File(kHallOfFameDirPath);
         File highScoresFile = new File(kHallOfFamePath);
         boolean createdDir = false, createdFile = false;
-        try
-        {
-            if(!highScoresFile.exists())
-            {
-                /*Creates the high scores directory if it does not exist*/
-                if(!highScoresDirectory.exists())
-                {
-                    createdDir = highScoresDirectory.mkdir();
-                }
-                
-                createdFile = highScoresFile.createNewFile();
-            }
-            
-            /*Writes to the high score file*/
-            FileWriter highScoreWriter = new FileWriter(highScoresFile, true);
-            highScoreWriter.write(score + " " + name + "\n");
-            highScoreWriter.close();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
 
+        if(!highScoresFile.exists())
+        {
+            /*Creates the high scores directory if it does not exist*/
+            if(!highScoresDirectory.exists())
+            {
+                createdDir = highScoresDirectory.mkdir();
+            }
+                
+            createdFile = highScoresFile.createNewFile();
+        }
+            
+        /*Writes to the high score file*/
+        FileWriter highScoreWriter = new FileWriter(highScoresFile, true);
+        highScoreWriter.write(score + " " + name + "\n");
+        highScoreWriter.close();
     }
     
-    private String parseAndSortHighScores(File highScoresFile)
+    private String parseAndSortHighScores(File highScoresFile) throws IOException
     {
         String highScoresString = "";
         ArrayList<HighScore> scoresList = new ArrayList<HighScore>();
         
-        try
+        Scanner scan = new Scanner(highScoresFile);
+        while(scan.hasNextLine())
         {
-            Scanner scan = new Scanner(highScoresFile);
-            while(scan.hasNextLine())
-            {
-                String curLine = scan.nextLine();
-                scoresList.add(new HighScore(Integer.parseInt(curLine.substring(0, curLine.indexOf(" "))), curLine.substring(curLine.indexOf(" ") + 1, curLine.length())));
-            }
-            
-            Collections.sort(scoresList, new HighScoreComparator());
-            
-            for(int scoreNdx = 0; scoreNdx < kHallSize && scoreNdx < scoresList.size(); scoreNdx++)
-            {
-                HighScore curScore = scoresList.get(scoreNdx);
-                //highScoresString = highScoresString.concat("         " + curScore.getScore() + "    " + curScore.getName() + "\n");
-                highScoresString = highScoresString.concat(String.format("%10s", curScore.getScore()) + "    " + curScore.getName() + "\n");
-            }
-            highScoresString = highScoresString.concat("\n");
+            String curLine = scan.nextLine();
+            scoresList.add(new HighScore(Integer.parseInt(curLine.substring(0, curLine.indexOf(" "))), curLine.substring(curLine.indexOf(" ") + 1, curLine.length())));
         }
-        catch(Exception e)
+            
+        Collections.sort(scoresList, new HighScoreComparator());
+            
+        for(int scoreNdx = 0; scoreNdx < kHallSize && scoreNdx < scoresList.size(); scoreNdx++)
         {
-            e.printStackTrace();
+            HighScore curScore = scoresList.get(scoreNdx);
+            //highScoresString = highScoresString.concat("         " + curScore.getScore() + "    " + curScore.getName() + "\n");
+            highScoresString = highScoresString.concat(String.format("%10s", curScore.getScore()) + "    " + curScore.getName() + "\n");
         }
+        highScoresString = highScoresString.concat("\n");
         
         return highScoresString;
     }
@@ -350,40 +319,27 @@ public class CollapseConsole
      *  score and name (in that order), separated by one or more blanks.
      *  Name is twenty characters max.  Leading blanks are allowed.
      */
-    public String getHighScores()
+    public String getHighScores() throws IOException
     {
         File highScoresFile = new File(kHallOfFamePath);
         String highScoresString = "";
         
-        try
+        if (highScoresFile.exists())
         {
-            if (highScoresFile.exists())
-            {
-                highScoresString = parseAndSortHighScores(highScoresFile);
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+            highScoresString = parseAndSortHighScores(highScoresFile);
         }
         
         return highScoresString;
     }
     
-    private int getPreferenceSize()
+    private int getPreferenceSize() throws IOException
     {
         int prefSize = kDefaultBoardSize;
-        try
-        {
-            Ini ini = new Ini();
-            ini.load(new FileReader(new File(kPreferencesPath)));
-            Ini.Section section = ini.get("Board Size");
-            prefSize = Integer.parseInt(section.get("small"));
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();    
-        }
+        Ini ini = new Ini();
+        
+        ini.load(new FileReader(new File(kPreferencesPath)));
+        Ini.Section section = ini.get("Board Size");
+        prefSize = Integer.parseInt(section.get("small"));
         
         return prefSize;
     }
