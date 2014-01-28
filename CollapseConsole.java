@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import org.ini4j.*;
 
 /**
  * CollapseConsole is the text-based console user interface to the Collapse game.
@@ -19,6 +20,7 @@ public class CollapseConsole
     private final static String kHallOfFameDirPath = "collapse";
     /*Path to high scores file*/
     private final static String kHallOfFamePath = "collapse/halloffame.ser";
+    private final static String kPreferencesPath = "collapse/Preferences.ini";
     private final static int kNumBoards = 5001;
     private final static int kRestart = 1;
     private final static int kNewGame = 2;
@@ -28,8 +30,10 @@ public class CollapseConsole
     private final static int kQuit = 6;
     private final static int kCharToInt = 65;
     private final static int kMaxNameLength = 20;
+    private final static int kDefaultBoardSize = 8;
     private int boardNum;
     private CollapseGame game;
+    private int boardPrefSize;
     
     /** Entry point for the application.
      *
@@ -52,6 +56,7 @@ public class CollapseConsole
     public CollapseConsole()
     {
         this.boardNum = new Random().nextInt(kNumBoards);
+        this.boardPrefSize = getPreferenceSize();
     }
     
     /** Set input/output sources for Stream-based user interfaces.
@@ -70,8 +75,8 @@ public class CollapseConsole
      */
     public void run()
     {
-        this.game = new CollapseGame(8, this.boardNum);
-        char[][] board;
+        this.game = new CollapseGame(this.boardPrefSize, this.boardNum);
+        //char[][] board;
         String userInput;
         int userChoice = 0;
         boolean gameOver = false;
@@ -79,31 +84,29 @@ public class CollapseConsole
         
         try
         {
+            //board = game.getCharacterBoard();
+            displayBoardAndOptions(game/*, board*/);
+            
             while(userChoice != kQuit)
-            {
-                board = game.getCharacterBoard();
-                displayBoard(game, board);
-                wtr.write("1)Restart 2)New Game 3)Select Game 4)Scores 5)Cheat 6)Quit \n");
-                wtr.flush();
-                
+            {   
                 userInput = scan.nextLine();
                 
-                if(Character.isLetter(userInput.charAt(0)))
+                if(Character.isLetter(userInput.charAt(0)) && userInput.length() == 2)
                 {
-                    if(userInput.length() == 2)
+
+                    int row = userInput.substring(0, 1).toUpperCase().charAt(0) - kCharToInt;
+                    int column = Integer.parseInt(userInput.substring(1, 2)) - 1;
+                    
+                    if (row < boardPrefSize && column < boardPrefSize && !game.cellEmpty(row, column))
                     {
-                        int row = userInput.substring(0, 1).toUpperCase().charAt(0) - kCharToInt;
-                        int column = Integer.parseInt(userInput.substring(1, 2)) - 1;
-                        if (row < board.length && column < board[0].length)
-                        {
-                            gameOver = game.takeTurn(row, column);
-                        }
+                        gameOver = game.takeTurn(row, column);
+                        displayBoardAndOptions(game);
+                        
                         if(gameOver)
                         {
-                            displayBoard(game, board);
                             gameOver(scan);
                             this.boardNum++;
-                            game = new CollapseGame(8, this.boardNum);
+                            game = new CollapseGame(boardPrefSize, this.boardNum);
                         }
                     }
                 }
@@ -115,24 +118,30 @@ public class CollapseConsole
                     {
                         case 1:
                             //restart the game
-                            game = new CollapseGame(8, this.boardNum);
+                            game = new CollapseGame(boardPrefSize, this.boardNum);
+                            displayBoardAndOptions(game);
                         break;
                         case 2:
                             //Start a new game on this board
                             this.boardNum++;
-                            game = new CollapseGame(8, this.boardNum);
+                            game = new CollapseGame(boardPrefSize, this.boardNum);
+                            displayBoardAndOptions(game/*, board*/);
                         break;
                         case 3:
                             //Select a game
                             selectGame(scan);
+                            displayBoardAndOptions(game/*, board*/);
                         break;
                         case 4:
                             //View high scores
+                            wtr.write(getHighScores());
+                            wtr.flush();
                         
                         break;
                         case 5:
                             //cheat
                             game.cheat();
+                            displayBoardAndOptions(game);
                         
                         break;
                         case 6:
@@ -140,7 +149,7 @@ public class CollapseConsole
                             scan.close();
                             System.exit(0);
                         break;
-                }
+                    }
                 }
             }
         }
@@ -173,14 +182,10 @@ public class CollapseConsole
             
                 if(name.length() > kMaxNameLength)
                 {
-                    name = name.substring(0, kMaxNameLength + 1);
+                    name = name.substring(0, kMaxNameLength);
                 }
                 
                 this.addHighScore(name, this.game.getNumberOfMoves());
-                wtr.write("4\n");
-                wtr.write(getHighScores());
-                wtr.write("2\n");
-                wtr.flush();
             }
         }
         catch(IOException e)
@@ -213,10 +218,11 @@ public class CollapseConsole
         
     }
     
-    private void displayBoard(CollapseGame game, char[][] board)
+    private void displayBoardAndOptions(CollapseGame game/*, char[][] board*/)
     {
         try
         {
+            char[][] board = game.getCharacterBoard();
             wtr.write("Collapse - board " + this.boardNum + "\n");
             wtr.write("Tiles left: " + game.getTilesLeft() + "    Moves: " + game.getNumberOfMoves() + "  \n");
             String colString = "     ";
@@ -253,6 +259,8 @@ public class CollapseConsole
             
             dashedLine = dashedLine.concat("-\n");
             wtr.write(dashedLine);
+            wtr.write("1)Restart 2)New Game 3)Select Game 4)Scores 5)Cheat 6)Quit \n");
+            wtr.flush();
             
         }
         catch(IOException e)
@@ -350,5 +358,23 @@ public class CollapseConsole
         }
         
         return highScoresString;
+    }
+    
+    private int getPreferenceSize()
+    {
+        int prefSize = kDefaultBoardSize;
+        try
+        {
+            Ini ini = new Ini();
+            ini.load(new FileReader(new File(kPreferencesPath)));
+            Ini.Section section = ini.get("Board Size");
+            prefSize = Integer.parseInt(section.get("small"));
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();    
+        }
+        
+        return prefSize;
     }
 }

@@ -49,7 +49,7 @@ public class CollapseGame
      */
     public char[][] getCharacterBoard()
     {
-        return this.characterBoard;
+        return this.characterBoard.clone();
     }
     
     /**
@@ -72,15 +72,15 @@ public class CollapseGame
                 
                 if(tileBoard[row][col] == CollapsePiece.green)
                 {
-                    characterBoard[row][col] = 'G';
+                    characterBoard[row][col] = '+';
                 }
                 if(tileBoard[row][col] == CollapsePiece.purple)
                 {
-                    characterBoard[row][col] = 'P';
+                    characterBoard[row][col] = 'x';
                 }
                 if(tileBoard[row][col] == CollapsePiece.cyan)
                 {
-                    characterBoard[row][col] = 'C';
+                    characterBoard[row][col] = 'o';
                 }
             }
         }
@@ -355,9 +355,9 @@ public class CollapseGame
             }
         
             tileBoard[0][0] = CollapsePiece.green;
-            characterBoard[0][0] = 'G';
+            characterBoard[0][0] = '+';
             tileBoard[0][1] = CollapsePiece.green;
-            characterBoard[0][1] = 'G';
+            characterBoard[0][1] = '+';
         
             isCheating = true;
         }
@@ -374,5 +374,16 @@ public class CollapseGame
             
             isCheating = false;
         }
+    }
+    
+    /**
+     * Determines if a the cell specified is empty or not.
+     * 
+     * @param row the row of the cell being checked
+     * @param col the column of the cell being checked
+     */
+    public boolean cellEmpty(int row, int col)
+    {
+        return tileBoard[row][col] == CollapsePiece.empty;
     }
 }
