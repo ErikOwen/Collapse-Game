@@ -20,15 +20,15 @@ public class GUIskeleton extends JFrame
     private ImageIcon[][] origBoard;
     private ImageIcon[] images;
     private Integer[][] values;
-    private String[] columns = {"","","","","","","","","","",};
-    private JLabel myStatus=null;
+    private String[] columns = {"", "", "", "", "" , "", "", "", "", "", };
+    private JLabel myStatus = null;
     private JMenuBar menuBar;
     private JTable table;
     private int score;
     private int clickCount;
     /* Square dimensions */
-    private int TileWidth = 60;
-    private int TileHeight = 30;
+    private int tileWidth = 60;
+    private int tileHeight = 30;
     
 
     /** Create a GUI.
@@ -60,25 +60,28 @@ public class GUIskeleton extends JFrame
     {
         loadImages();
         newGame();
-        table = new JTable(myBoard,columns); 
+        table = new JTable(myBoard, columns); 
         
         TableColumn column = null;
+        
+        /*Determines if the board is null or not*/
         if (myBoard != null)
         {
             // Set the dimensions for each column in the board to match the image */
-            for (int i = 0; i < 10; i++)
+            for (int iter = 0; iter < 10; iter++)
             {
-                column = table.getColumnModel().getColumn(i);
-                column.setMaxWidth(TileWidth);
-                column.setMinWidth(TileWidth);
+                column = table.getColumnModel().getColumn(iter);
+                column.setMaxWidth(tileWidth);
+                column.setMinWidth(tileWidth);
             }
         }
-        table.setDefaultEditor(Object.class, null);  // remove editor makes table not editable
+         // remove editor makes table not editable
+        table.setDefaultEditor(Object.class, null);
 
         // Define the layout manager that will control order of components
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         
-                myStatus = new JLabel("0");
+        myStatus = new JLabel("0");
         
         // Add a menubar
         menuBar = new javax.swing.JMenuBar();
@@ -137,7 +140,7 @@ public class GUIskeleton extends JFrame
         // Define the characteristics of the table that shows the game board        
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setCellSelectionEnabled(false);
-        table.setRowHeight(TileHeight);
+        table.setRowHeight(tileHeight);
 
         table.setOpaque(false);
         table.setShowGrid(false);
@@ -155,8 +158,8 @@ public class GUIskeleton extends JFrame
                 // Is it a right mouse click?
                 if (SwingUtilities.isRightMouseButton(ev)) 
                 {
-                    row = (int) (ev.getPoint().getY()/TileHeight);
-                    col = (int) (ev.getPoint().getX()/TileWidth);
+                    row = (int) (ev.getPoint().getY()/tileHeight);
+                    col = (int) (ev.getPoint().getX()/tileWidth);
                     // Turn the value negative
                     values[row][col] = -(Integer) values[row][col];
                 }
@@ -181,8 +184,10 @@ public class GUIskeleton extends JFrame
     private void restart()
     {
         score = 0;
+        /*Iterates trhough all of the rows*/
         for(int xVal = 0; xVal < myBoard.length; xVal++)
         {
+            /*Iterates through all of the columns*/
             for(int yVal = 0; yVal < myBoard[0].length; yVal++)
             {
                 myBoard[xVal][yVal] = origBoard[xVal][yVal];
@@ -212,22 +217,28 @@ public class GUIskeleton extends JFrame
     {
         score = 0;
         
-        for (int i = 0;i<10;i++)
+        /*Iterates through all of the rows*/
+        for (int row = 0; row < 10; row++)
         {
-            for (int j=0;j<10;j++)
+            /*Iterates through all of the columns*/
+            for (int col = 0; col < 10; col++)
             {
                 Integer cellValue = new Integer((int)(-5 + (Math.random()*10)));
                 Integer picValue = new Integer((int)(0 + (Math.random()*3)));
-                values[i][j] = cellValue;
+                values[row][col] = cellValue;
                 ImageIcon img = images[picValue];
-                origBoard[i][j] = img;
-                myBoard[i][j] = img;
+                origBoard[row][col] = img;
+                myBoard[row][col] = img;
             }
         }
         clickCount = 0;
     }
     
-    // Local main to launch the GUI
+    /**
+     * Local main to launch the GUI
+     * 
+     * @param args parameters to the program
+     */
     public static void main(String[] args)
     {
         // Create the GUI 

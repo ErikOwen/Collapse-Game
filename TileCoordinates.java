@@ -12,6 +12,9 @@ public class TileCoordinates
 
     /**
      * Constructor for objects of class TileCoordinates
+     * 
+     * @param row the row coordinate
+     * @param col the col coordinate
      */
     public TileCoordinates(int row, int col)
     {

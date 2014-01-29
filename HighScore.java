@@ -13,6 +13,9 @@ public class HighScore
 
     /**
      * Constructor for objects of class HighScore
+     * 
+     * @param score the number of moves the player made
+     * @param name the name of the player
      */
     public HighScore(int score, String name)
     {
