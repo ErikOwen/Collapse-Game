@@ -21,7 +21,7 @@ public class CollapseConsole
     /*Path to high scores file*/
     private final static String kHallOfFamePath = "collapse/halloffame.ser";
     private final static String kPreferencesPath = "collapse/Preferences.ini";
-    private final static int kNumBoards = 5001;
+    private final static int kNumBoards = 5000;
     private final static int kRestart = 1;
     private final static int kNewGame = 2;
     private final static int kSelectGame = 3;
@@ -83,7 +83,7 @@ public class CollapseConsole
         this.game = new CollapseGame(this.boardPrefSize, this.boardNum);
         String userInput;
         int userChoiceCopy, userChoice = 0;
-        boolean gameOver = false;
+        boolean gameOver = false, validMove = false;
         Scanner scan = new Scanner(reader);
 
         displayBoardAndOptions();
@@ -94,52 +94,43 @@ public class CollapseConsole
             try
             {
                 userInput = scan.nextLine().trim();
-                
-                /*Determines if the user enters the correct format for choosing a tile*/
-                //if(Character.isLetter(userInput.charAt(0)) && userInput.length() == 2)
-                //{
-                if(userInput.length() == 2)
+                if(userInput.length() == 1)
                 {
-
+                    userChoice = Integer.parseInt(userInput);
+                    executeCommand(scan, userChoice);
+                    
+                }
+                else if(userInput.length() > 1)
+                {
+                    userInput = userInput.substring(0, 2);
                     int row = userInput.substring(0, 1)
                         .toUpperCase().charAt(0) - kCharToInt;
                     int column = Integer.parseInt(userInput.substring(1, 2)) - 1;
                     
-                    /*Determines if the chosen spot is a valid spot on the board*/
-                    if (row >= 0 && row < boardPrefSize && column >= 0 && column <
-                        boardPrefSize)
+                    validMove = game.takeTurn(row, column);
+                    
+                    if(validMove)
                     {
-                        /*Determines if move is a valid move*/
-                        if(game.takeTurn(row, column))
-                        {
-                            gameOver = game.isGameOver();
-                            displayBoardAndOptions();
-                        }
-                        
-                        /*If the game is over ask if user wants to enter high score*/
-                        if(gameOver)
-                        {
-                            gameOver(scan);
-                        }
+                        gameOver = game.isGameOver();
+                        displayBoardAndOptions();
+                    }
+                    if(gameOver)
+                    {
+                        gameOver(scan);
                     }
                 }
-                else
-                {
-                    userChoice = Integer.parseInt(userInput);
-                    userChoiceCopy = userChoice;
-                    userChoice = executeCommand(scan, userChoiceCopy);
-                }
+                
+
             }
             catch(Exception e)
             {
                 userChoice = 0;
-                //writer.write("ERRRRRRorr!");
             }
         }
         
     }
     
-    private int executeCommand(Scanner scan, int userChoice) throws IOException
+    private void executeCommand(Scanner scan, int userChoice) throws IOException
     {
         /*Determines which choice the user made and executes that option*/
         switch(userChoice)
@@ -151,7 +142,14 @@ public class CollapseConsole
                 break;
             case kNewGame:
                 //Start a new game on this board
-                this.boardNum++;
+                if(this.boardNum == kNumBoards)
+                {
+                    this.boardNum = 1;
+                }
+                else
+                {
+                    this.boardNum++;
+                }
                 this.game = new CollapseGame(this.boardPrefSize, this.boardNum);
                 displayBoardAndOptions();
                 break;
@@ -176,20 +174,17 @@ public class CollapseConsole
                 //System.exit(0);
                 break;
         }
-        
-        return userChoice;
     }
     
     private void gameOver(Scanner scan) throws IOException
     {
-        String input;
-        String name;
+        String input, name;
 
         writer.write("Game Won Notification: Game " + this.boardNum + " Cleared! \n");
         writer.write("Save your score? (y/n)\n");
         writer.flush();
         
-        input = scan.nextLine();
+        input = scan.nextLine().trim().toLowerCase();
         
         /*Determines if user wants to save high score or not*/
         if(input.equals("y"))
@@ -222,7 +217,7 @@ public class CollapseConsole
         boardNumber = Integer.parseInt(boardNumberString);
         
         /*Makes sure the board number is in the range of 1-5000*/
-        if(boardNumber > 0 && boardNumber < kNumBoards)
+        if(boardNumber > 0 && boardNumber <= kNumBoards)
         {
             this.game = new CollapseGame(this.boardPrefSize, boardNumber);
             this.boardNum = boardNumber;

@@ -76,7 +76,7 @@ public class CollapseGame
             for (int col = 0; col < tileBoard[0].length; col++)
             {
                 // Generate one of three kinds of tiles
-                tileBoard[row][col] = pieces[generator.nextInt(3)];
+                tileBoard[row][col] = pieces[generator.nextInt(pieces.length)];
                 
                 /*If the current tile is green, then it sets the char to '+'*/
                 if(tileBoard[row][col] == CollapsePiece.green)
@@ -137,22 +137,25 @@ public class CollapseGame
         boolean validTurn = false;
         /*Determines if the current spot is empty or not*/
         if(rowPos >= 0 && rowPos < tileBoard.length && colPos >= 0 &&
-            colPos < tileBoard.length && tileBoard[rowPos][colPos]
-                != CollapsePiece.empty)
+            colPos < tileBoard.length)
         {
-            /*Determines if the tile chosen has a(n) adjacent tile(s)*/
-            if(hasAdjacentTiles(rowPos, colPos))
+            /*Checks to see if current position is not empty*/
+            if(tileBoard[rowPos][colPos] != CollapsePiece.empty)
             {
-                //Removes cell and all adjacent tiles of the same color
-                removeSelection(rowPos, colPos);
-                //Shifts the necesssary cells downwards to fill in blank spots
-                shiftCellsDownwards();
-                //Shifts the columns to the center if necessary
-                shiftColumnsToCenter();
-            }
+                /*Determines if the tile chosen has a(n) adjacent tile(s)*/
+                if(hasAdjacentTiles(rowPos, colPos))
+                {
+                    //Removes cell and all adjacent tiles of the same color
+                    removeSelection(rowPos, colPos);
+                    //Shifts the necesssary cells downwards to fill in blank spots
+                    shiftCellsDownwards();
+                    //Shifts the columns to the center if necessary
+                    shiftColumnsToCenter();
+                }
             
-            numMoves++;
-            validTurn = true;
+                    numMoves++;
+                    validTurn = true;
+            }
         }
         
         return validTurn;
