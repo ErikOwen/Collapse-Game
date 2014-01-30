@@ -12,8 +12,8 @@ import org.ini4j.*;
  */
 public class CollapseConsole
 {
-    private static InputStreamReader reader;
-    private static OutputStreamWriter writer;
+    private static BufferedReader reader;
+    private static PrintWriter writer;
     /*How many hall of fame entries to return */
     public final static int kHallSize = 5;
     /*Path to high scores directory*/
@@ -40,28 +40,28 @@ public class CollapseConsole
      *  @param args ignored     
      */
     public static void main(String[] args)
-    {                   
-        try
-        {
-            CollapseConsole app = new CollapseConsole(); 
-            app.setIOsources(new InputStreamReader(System.in), 
-                         new OutputStreamWriter(System.out));
-            app.run();
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
+    {   
+        CollapseConsole app = new CollapseConsole(); 
+        app.setIOsources(new InputStreamReader(System.in), 
+            new OutputStreamWriter(System.out));
+        app.run();
     }
 
     /** Construct a new instance of this class.
      * Create the game components and initialize them,
      * create the user interface and connect it to the game.
      */
-    public CollapseConsole() throws IOException
+    public CollapseConsole()
     {
-        this.boardNum = new Random().nextInt(kNumBoards);
-        this.boardPrefSize = getPreferenceSize();
+        try
+        {
+            this.boardNum = new Random().nextInt(kNumBoards);
+            this.boardPrefSize = getPreferenceSize();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
     }
     
     /** Set input/output sources for Stream-based user interfaces.
@@ -70,20 +70,19 @@ public class CollapseConsole
      */
     public void setIOsources(Reader rdr, Writer wtr) 
     {
-        this.reader = (InputStreamReader)rdr;
-        this.writer = (OutputStreamWriter)wtr;
+        this.reader = new BufferedReader(rdr);
+        this.writer = new PrintWriter(wtr);
     }
 
     /** Run the console user interface, using the i/o streams provided by
      *  setIOsources();
      *  @pre setIOsources() has been called.
      */
-    public void run() throws IOException
+    public void run()
     {
         this.game = new CollapseGame(this.boardPrefSize, this.boardNum);
         String userInput;
-        int userChoice = 0;
-        int userChoiceCopy;
+        int userChoiceCopy, userChoice = 0;
         boolean gameOver = false;
         Scanner scan = new Scanner(reader);
 
@@ -94,10 +93,12 @@ public class CollapseConsole
         {   
             try
             {
-                userInput = scan.nextLine();
+                userInput = scan.nextLine().trim();
                 
                 /*Determines if the user enters the correct format for choosing a tile*/
-                if(Character.isLetter(userInput.charAt(0)) && userInput.length() == 2)
+                //if(Character.isLetter(userInput.charAt(0)) && userInput.length() == 2)
+                //{
+                if(userInput.length() == 2)
                 {
 
                     int row = userInput.substring(0, 1)
@@ -105,11 +106,15 @@ public class CollapseConsole
                     int column = Integer.parseInt(userInput.substring(1, 2)) - 1;
                     
                     /*Determines if the chosen spot is a valid spot on the board*/
-                    if (row < boardPrefSize && column <
-                        boardPrefSize && !game.cellEmpty(row, column))
+                    if (row >= 0 && row < boardPrefSize && column >= 0 && column <
+                        boardPrefSize)
                     {
-                        gameOver = game.takeTurn(row, column);
-                        displayBoardAndOptions();
+                        /*Determines if move is a valid move*/
+                        if(game.takeTurn(row, column))
+                        {
+                            gameOver = game.isGameOver();
+                            displayBoardAndOptions();
+                        }
                         
                         /*If the game is over ask if user wants to enter high score*/
                         if(gameOver)
@@ -128,6 +133,7 @@ public class CollapseConsole
             catch(Exception e)
             {
                 userChoice = 0;
+                //writer.write("ERRRRRRorr!");
             }
         }
         
@@ -205,7 +211,7 @@ public class CollapseConsole
         }
     }
     
-    private void selectGame(Scanner scan) throws IOException
+    private void selectGame(Scanner scan)
     {
         String boardNumberString;
         int boardNumber;
@@ -223,7 +229,7 @@ public class CollapseConsole
         }
     }
     
-    private void displayBoardAndOptions() throws IOException
+    private void displayBoardAndOptions()
     {
         char[][] board = game.getCharacterBoard();
         writer.write("Collapse - board " + this.boardNum + "\n");
@@ -345,28 +351,34 @@ public class CollapseConsole
      *  score and name (in that order), separated by one or more blanks.
      *  Name is twenty characters max.  Leading blanks are allowed.
      */
-    public String getHighScores() throws IOException
+    public String getHighScores()
     {
         File highScoresFile = new File(kHallOfFamePath);
         String highScoresString = "";
         
-        /*Gets the high scores if the file exists*/
-        if (highScoresFile.exists())
+        try
         {
-            highScoresString = parseAndSortHighScores(highScoresFile);
+            /*Gets the high scores if the file exists*/
+            if (highScoresFile.exists())
+            {
+                highScoresString = parseAndSortHighScores(highScoresFile);
+            }
+        }
+        catch(Exception e)
+        {
+            highScoresString = "";
         }
         
         return highScoresString;
     }
     
     private int getPreferenceSize() throws IOException
-    {
-        int prefSize = kDefaultBoardSize;
+    {   
         Ini ini = new Ini();
         
         ini.load(new FileReader(new File(kPreferencesPath)));
         Ini.Section section = ini.get("Board Size");
-        prefSize = Integer.parseInt(section.get("small"));
+        int prefSize = Integer.parseInt(section.get("small"));
         
         return prefSize;
     }

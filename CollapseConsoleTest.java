@@ -19,7 +19,7 @@ public class CollapseConsoleTest extends junit.framework.TestCase
     /**
      * Tests the highscores functionality
      */
-    public void testHighScores()
+    /*public void testHighScores()
     {
         try
         {
@@ -43,25 +43,85 @@ public class CollapseConsoleTest extends junit.framework.TestCase
         {
             e.printStackTrace();
         }
-    }
+    }*/
     
     
     /**
      * Mainly tests the run method
      */
-	public void test2()
-	{
-	    try
-	    {
-	        CollapseConsole app = new CollapseConsole();
-	        app.setIOsources(new FileReader(new File("testData/testInput.txt")), new OutputStreamWriter(System.out));
-	        app.run();
-	    }
-	    catch(Exception e)
-	    {
-	        System.out.println("Test failed");
-	    }
-	}
+    public void test2()
+    {
+        try
+        {
+            CollapseConsole app = new CollapseConsole();
+            app.setIOsources(new FileReader(new File("testData/testInput.txt")),
+                new OutputStreamWriter(System.out));
+            app.run();
+        }
+        catch(Exception e)
+        {
+            System.out.println("Test failed");
+        }
+    }
+
+    /**
+     * Tests some of the CollapseConsole functionality.
+     */
+    public void test3()
+    {
+        try
+        {
+            CollapseConsole app = new CollapseConsole();
+            app.setIOsources(new FileReader(new File("testData/testInput2.txt")),
+                new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream("testData/testOutput2.txt"), "utf-8")));
+            app.run();
+        }
+        catch(Exception e)
+        {
+            System.out.println("Test failed");
+        }
+    }
+
+    /**
+     * Tests some of the CollapseConsole functionality.
+     */
+    public void test4()
+    {
+        try
+        {
+            CollapseConsole app = new CollapseConsole();
+            app.setIOsources(new FileReader(new File("testData/testInput3.txt")),
+                new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream("testData/testOutput3.txt"), "utf-8")));
+            app.run();
+        }
+        catch(Exception e)
+        {
+            System.out.println("Test failed");
+        }
+    }
+    
+    /**
+     * Tests some of the CollapseConsole functionality.
+     */
+    public void test5()
+    {
+        try
+        {
+            CollapseConsole app = new CollapseConsole();
+            app.setIOsources(new FileReader(new File("testData/testInput4.txt")),
+                new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream("testData/testOutput4.txt"), "utf-8")));
+            app.run();
+        }
+        catch(Exception e)
+        {
+            System.out.println("Test failed");
+        }
+    }
 }
+
+
 
 

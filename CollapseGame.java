@@ -130,12 +130,15 @@ public class CollapseGame
      * @param rowPos the row that the user has chosen for their turn
      * @param colPos the column that the user has chosen for their turn
      * 
-     * @return boolean: true if game is over, false if it is still going
+     * @return boolean: true if move was a valid spot on the board
      */
     public boolean takeTurn(int rowPos, int colPos)
     {   
+        boolean validTurn = false;
         /*Determines if the current spot is empty or not*/
-        if(tileBoard[rowPos][colPos] != CollapsePiece.empty)
+        if(rowPos >= 0 && rowPos < tileBoard.length && colPos >= 0 &&
+            colPos < tileBoard.length && tileBoard[rowPos][colPos]
+                != CollapsePiece.empty)
         {
             /*Determines if the tile chosen has a(n) adjacent tile(s)*/
             if(hasAdjacentTiles(rowPos, colPos))
@@ -149,9 +152,10 @@ public class CollapseGame
             }
             
             numMoves++;
+            validTurn = true;
         }
         
-        return isGameOver();
+        return validTurn;
     }
     
     /**
@@ -192,30 +196,34 @@ public class CollapseGame
     /**
      * Checks to see if any of the adjacent tiles are of the same type
      */
-    private boolean hasAdjacentTiles(int row, int col)
+    protected boolean hasAdjacentTiles(int row, int col)
     {
         boolean hasAdjacentTiles = false;
         CollapsePiece color = tileBoard[row][col];
         
-        /*Looks above the current tile to see if it there is the same tile type*/
-        if(row > 0 && tileBoard[row - 1][col] == color)
+        /*Only checks for adjacent tiles if tile is not empty*/
+        if(color != CollapsePiece.empty)
         {
-            hasAdjacentTiles = true;
-        }
-        /*Looks below the current tile to see if it there is the same tile type*/
-        if(row < tileBoard.length - 1 && tileBoard[row + 1][col] == color)
-        {
-            hasAdjacentTiles = true;
-        }
-        /*Looks right of the current tile to see if it there is the same tile type*/
-        if(col > 0 && tileBoard[row][col - 1] == color)
-        {
-            hasAdjacentTiles = true;   
-        }
-        /*Looks left of the current tile to see if it there is the same tile type*/
-        if(col < tileBoard[0].length - 1 && tileBoard[row][col + 1] == color)
-        {
-            hasAdjacentTiles = true;
+            /*Looks above the current tile to see if it there is the same tile type*/
+            if(row > 0 && tileBoard[row - 1][col] == color)
+            {
+                hasAdjacentTiles = true;
+            }
+            /*Looks below the current tile to see if it there is the same tile type*/
+            if(row < tileBoard.length - 1 && tileBoard[row + 1][col] == color)
+            {
+                hasAdjacentTiles = true;
+            }
+            /*Looks right of the current tile to see if it there is the same tile type*/
+            if(col > 0 && tileBoard[row][col - 1] == color)
+            {
+                hasAdjacentTiles = true;   
+            }
+            /*Looks left of the current tile to see if it there is the same tile type*/
+            if(col < tileBoard[0].length - 1 && tileBoard[row][col + 1] == color)
+            {
+                hasAdjacentTiles = true;
+            }
         }
         
         return hasAdjacentTiles;
@@ -468,18 +476,5 @@ public class CollapseGame
             
             isCheating = false;
         }
-    }
-    
-    /**
-     * Determines if a the cell specified is empty or not.
-     * 
-     * @param row the row of the cell being checked
-     * @param col the column of the cell being checked
-     * 
-     * @return a boolean indicating if the cell is empty or not.
-     */
-    public boolean cellEmpty(int row, int col)
-    {
-        return tileBoard[row][col] == CollapsePiece.empty;
     }
 }
