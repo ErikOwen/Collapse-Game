@@ -20,7 +20,7 @@ public class CollapseConsole
     private final static String kHallOfFameDirPath = "collapse";
     /*Path to high scores file*/
     private final static String kHallOfFamePath = "collapse/halloffame.ser";
-    private final static String kPreferencesPath = "collapse/Preferences.ini";
+    private final static String kPreferencesPath = "collapse/preferences.ini";
     private final static int kNumBoards = 5000;
     private final static int kRestart = 1;
     private final static int kNewGame = 2;
@@ -187,6 +187,8 @@ public class CollapseConsole
                 //exit
                 scan.close();
                 //System.exit(0);
+                break;
+            default:
                 break;
         }
     }
