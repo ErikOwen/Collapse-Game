@@ -10,11 +10,10 @@ public class CollapseGame
 {
     private CollapsePiece[][] tileBoard;
     private char[][] characterBoard;
-    private CollapsePiece[][] savedTileBoard;
-    private char[][] savedCharacterBoard;
+    //private CollapsePiece[][] savedTileBoard;
+    //private char[][] savedCharacterBoard;
     private int boardSize;
     private int numMoves;
-    private boolean isCheating;
 
     /**
      * Constructor for objects of class CollapseGame
@@ -27,10 +26,9 @@ public class CollapseGame
         this.boardSize = dimension;
         this.tileBoard = new CollapsePiece[boardSize][boardSize];
         this.characterBoard = new char[boardSize][boardSize];
-        this.savedTileBoard = new CollapsePiece[boardSize][boardSize];
-        this.savedCharacterBoard = new char[boardSize][boardSize];
+        //this.savedTileBoard = new CollapsePiece[boardSize][boardSize];
+        //this.savedCharacterBoard = new char[boardSize][boardSize];
         this.numMoves = 0;
-        this.isCheating = false;
         
         this.generateBoard(boardNumber);
     }
@@ -153,8 +151,8 @@ public class CollapseGame
                     shiftColumnsToCenter();
                 }
             
-                    numMoves++;
-                    validTurn = true;
+                numMoves++;
+                validTurn = true;
             }
         }
         
@@ -328,51 +326,12 @@ public class CollapseGame
     {
         int centerCol = boardSize / 2;
         
-        shiftLeftColumnsToCenter(centerCol);
-        shiftRightColumnsToCenter(centerCol);
-    }
-    
-    /**
-     * Helper method to shiftColumnsDown
-     */
-    private void shiftLeftColumnsToCenter(int centerCol)
-    {
         /*Iterates through all of the columns left of the center*/
         for(int ndx = centerCol; ndx < boardSize - 1; ndx++)
         {
-            /*Determines if current column is empty*/
-            if(columnIsEmpty(ndx))
-            {
-                int curCol = ndx + 1;
-                
-                /*Searches for closes non-empty row to center*/
-                while(curCol < boardSize && columnIsEmpty(curCol))
-                {
-                    curCol++;
-                }
-                
-                /*If there is a non-empty row, shift it*/ 
-                if(curCol < boardSize)
-                {
-                    /*Shifts the column and makes the old spot empty*/
-                    for(int rowIter = 0; rowIter < tileBoard.length; rowIter++)
-                    {
-                        tileBoard[rowIter][ndx] = tileBoard[rowIter][curCol];
-                        tileBoard[rowIter][curCol] = CollapsePiece.empty;
-                        
-                        characterBoard[rowIter][ndx] = characterBoard[rowIter][curCol];
-                        characterBoard[rowIter][curCol] = ' ';
-                    }
-                }
-            }
+            shift(ndx, 1);
         }
-    }
-    
-    /**
-     * Helper method to shiftColumnsDown
-     */
-    private void shiftRightColumnsToCenter(int centerCol)
-    {
+        
         /*If the board is even sized the move the center left one*/
         if(boardSize % 2 == 0)
         {
@@ -382,33 +341,43 @@ public class CollapseGame
         //Shift the cells left of the center to the center, if needed
         for(int ndx = centerCol; ndx > 0; ndx--)
         {
-            /*If the column is empty then shift contents towards center*/
-            if(columnIsEmpty(ndx))
+            shift(ndx, -1);
+        }
+    }
+    
+    /**
+     * Helper method to shiftColumnsToCenter, shifts
+     * the current column in the specified direction
+     */
+    private void shift(int ndx, int dir)
+    {
+        /*Determines if current column is empty*/
+        if(columnIsEmpty(ndx))
+        {
+            int curCol = ndx + dir;
+                
+            /*Searches for closes non-empty row to center*/
+            while(curCol >= 0 && curCol < boardSize && columnIsEmpty(curCol))
             {
-                int curCol = ndx - 1;
+                curCol = curCol + dir;
+            }
                 
-                /*Searches for closes non-empty row to center*/
-                while(curCol >= 0 && columnIsEmpty(curCol))
+            /*If there is a non-empty row, shift it*/ 
+            if(curCol >= 0 && curCol < boardSize)
+            {
+                /*Shifts the column and makes the old spot empty*/
+                for(int rowIter = 0; rowIter < tileBoard.length; rowIter++)
                 {
-                    curCol--;
-                }
-                
-                /*If there is a non-empty row, shift it*/ 
-                if(curCol >= 0)
-                {
-                    /*Shifts the column and makes the old spot empty*/
-                    for(int rowIter = 0; rowIter < tileBoard.length; rowIter++)
-                    {
-                        tileBoard[rowIter][ndx] = tileBoard[rowIter][curCol];
-                        tileBoard[rowIter][curCol] = CollapsePiece.empty;
+                    tileBoard[rowIter][ndx] = tileBoard[rowIter][curCol];
+                    tileBoard[rowIter][curCol] = CollapsePiece.empty;
                         
-                        characterBoard[rowIter][ndx] = characterBoard[rowIter][curCol];
-                        characterBoard[rowIter][curCol] = ' ';
-                    }
+                    characterBoard[rowIter][ndx] = characterBoard[rowIter][curCol];
+                    characterBoard[rowIter][curCol] = ' ';
                 }
             }
         }
     }
+    
     
     /**
      * Checks to see if a column is empty.
@@ -437,47 +406,20 @@ public class CollapseGame
      */
     public void cheat()
     {
-        /*Sets the board to cheat mode*/
-        if(!isCheating)
+        /*Iterates through all of the rows of the current board*/
+        for (int rowIter = 0; rowIter < tileBoard.length; rowIter++)
         {
-            //Save both the boards in case if player undoes cheat
-            /*Iterates throug all of the rows of the current board*/
-            for (int rowIter = 0; rowIter < tileBoard.length; rowIter++)
-            {
-                /*Iterates throug all of the columns of the current board*/
-                for(int colIter = 0; colIter < tileBoard[0].length; colIter++)
-                {
-                    savedTileBoard[rowIter][colIter] = tileBoard[rowIter][colIter];
-                    savedCharacterBoard[rowIter][colIter] =
-                        characterBoard[rowIter][colIter];
-                
-                    tileBoard[rowIter][colIter] = CollapsePiece.empty;
-                    characterBoard[rowIter][colIter] = ' ';
-                }
+            /*Iterates throug all of the columns of the current board*/
+            for(int colIter = 0; colIter < tileBoard[0].length; colIter++)
+            {          
+                tileBoard[rowIter][colIter] = CollapsePiece.empty;
+                characterBoard[rowIter][colIter] = ' ';
             }
         
             tileBoard[0][0] = CollapsePiece.green;
             characterBoard[0][0] = '+';
             tileBoard[0][1] = CollapsePiece.green;
-            characterBoard[0][1] = '+';
-        
-            isCheating = true;
-        }
-        else
-        {
-            /*Iterates throug all of the rows of the saved board*/
-            for (int rowIter = 0; rowIter < tileBoard.length; rowIter++)
-            {
-                /*Iterates throug all of the columns of the saved board*/
-                for(int colIter = 0; colIter < tileBoard[0].length; colIter++)
-                {
-                    tileBoard[rowIter][colIter] = savedTileBoard[rowIter][colIter];
-                    characterBoard[rowIter][colIter] =
-                        savedCharacterBoard[rowIter][colIter];
-                }
-            }
-            
-            isCheating = false;
+            characterBoard[0][1] = '+';   
         }
     }
 }

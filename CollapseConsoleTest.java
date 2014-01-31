@@ -60,7 +60,7 @@ public class CollapseConsoleTest extends junit.framework.TestCase
         }
         catch(Exception e)
         {
-            System.out.println("Test failed");
+            System.out.print("");
         }
     }
 
@@ -79,7 +79,7 @@ public class CollapseConsoleTest extends junit.framework.TestCase
         }
         catch(Exception e)
         {
-            System.out.println("Test failed");
+            System.out.print("");
         }
     }
 
@@ -98,7 +98,7 @@ public class CollapseConsoleTest extends junit.framework.TestCase
         }
         catch(Exception e)
         {
-            System.out.println("Test failed");
+            System.out.print("");
         }
     }
     
@@ -117,10 +117,70 @@ public class CollapseConsoleTest extends junit.framework.TestCase
         }
         catch(Exception e)
         {
-            System.out.println("Test failed");
+            System.out.print(""); 
+        }
+    }
+
+    /**
+     * Tests some of the CollapseConsole functionality.
+     */
+    public void test6()
+    {
+        try
+        {
+            CollapseConsole app = new CollapseConsole();
+            app.setIOsources(new FileReader(new File("testData/testInput5.txt")),
+                new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream("testData/testOutput5.txt"), "utf-8")));
+            app.run();
+        }
+        catch(Exception e)
+        {
+            System.out.print("");
+        }
+    }
+    
+    /**
+     * Tests some of the CollapseConsole functionality.
+     */
+    public void test7()
+    {
+        try
+        {
+            CollapseConsole app = new CollapseConsole();
+            app.setIOsources(new FileReader(new File("testData/testInput6.txt")),
+                new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream("testData/testOutput6.txt"), "utf-8")));
+            app.run();
+        }
+        catch(Exception e)
+        {
+            System.out.print("");   
+        }
+    }
+
+    /**
+     * Tests some of the CollapseConsole functionality.
+     */
+    public void test8()
+    {
+        try
+        {
+            CollapseConsole app = new CollapseConsole();
+            app.setIOsources(new FileReader(new File("testData/testInput7.txt")),
+                new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream("testData/testOutput7.txt"), "utf-8")));
+            app.run();
+        }
+        catch(Exception e)
+        {
+            System.out.print("");   
         }
     }
 }
+
+
+
 
 
 

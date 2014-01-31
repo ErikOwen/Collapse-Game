@@ -53,7 +53,7 @@ public class CollapseConsole
      */
     public CollapseConsole()
     {
-        try
+        /*try
         {
             this.boardNum = new Random().nextInt(kNumBoards);
             this.boardPrefSize = getPreferenceSize();
@@ -61,7 +61,7 @@ public class CollapseConsole
         catch(IOException e)
         {
             e.printStackTrace();
-        }
+        }*/
     }
     
     /** Set input/output sources for Stream-based user interfaces.
@@ -80,6 +80,15 @@ public class CollapseConsole
      */
     public void run()
     {
+        this.boardNum = new Random().nextInt(kNumBoards);
+        try
+        {
+            this.boardPrefSize = getPreferenceSize();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
         this.game = new CollapseGame(this.boardPrefSize, this.boardNum);
         String userInput;
         int userChoiceCopy, userChoice = 0;
@@ -94,12 +103,15 @@ public class CollapseConsole
             try
             {
                 userInput = scan.nextLine().trim();
+                
+                /*If the user only enters one character*/
                 if(userInput.length() == 1)
                 {
                     userChoice = Integer.parseInt(userInput);
                     executeCommand(scan, userChoice);
                     
                 }
+                /*If the character enters more than one character*/
                 else if(userInput.length() > 1)
                 {
                     userInput = userInput.substring(0, 2);
@@ -109,11 +121,13 @@ public class CollapseConsole
                     
                     validMove = game.takeTurn(row, column);
                     
+                    /*Determines if the move is valid*/
                     if(validMove)
                     {
                         gameOver = game.isGameOver();
                         displayBoardAndOptions();
                     }
+                    /*Determines if the game is over*/
                     if(gameOver)
                     {
                         gameOver(scan);
@@ -160,6 +174,7 @@ public class CollapseConsole
                 break;
             case kScores:
                 //View high scores
+                writer.write("-- High Scores --\n");
                 writer.write(getHighScores());
                 writer.flush();           
                 break;
@@ -325,7 +340,8 @@ public class CollapseConsole
                  curLine.indexOf(" "))), curLine.substring(curLine.indexOf(" ") + 1,
                       curLine.length())));
         }
-            
+        
+        scan.close();
         Collections.sort(scoresList, new HighScoreComparator());
         
         /*Gets the top 5 best scores*/
@@ -337,7 +353,6 @@ public class CollapseConsole
                  curScore.getScore()) + "    " + curScore.getName() + "\n");
         }
         highScoresString = highScoresString.concat("\n");
-        
         return highScoresString;
     }
     

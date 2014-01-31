@@ -131,7 +131,44 @@ public class CollapseGameTest extends junit.framework.TestCase
         game.takeTurn(2, 0);
         game.takeTurn(2, 2);
     }
+
+    /**
+     * Tests some of the CollapseGame functionality
+     */
+    public void testTakeTurn()
+    {
+        CollapseGame game = new CollapseGame(8, 472);
+        assertFalse(game.takeTurn(0, 8));
+        assertFalse(game.takeTurn(8, 0));
+        assertTrue(game.takeTurn(0, 0));
+        assertTrue(game.takeTurn(7, 7));
+    }
+
+    /**
+     * Tests some of the CollapseGame functionality
+     */
+    public void test5()
+    {
+        CollapseGame game = new CollapseGame(7, 109);
+        assertTrue(game.takeTurn(0, 0));
+        assertTrue(game.takeTurn(1, 1));
+        assertTrue(game.takeTurn(2, 2));
+        assertTrue(game.takeTurn(3, 3));
+        assertTrue(game.takeTurn(6, 4));
+        assertTrue(game.takeTurn(5, 5));
+        assertTrue(game.takeTurn(6, 3));
+        assertFalse(game.takeTurn(-6, -6));
+        
+        game.cheat();
+        assertFalse(game.takeTurn(5, 5));
+        assertTrue(game.takeTurn(0, 1));
+        assertTrue(game.isGameOver());
+        game.cheat();
+        assertFalse(game.isGameOver());
+    }
 }
+
+
 
 
 
