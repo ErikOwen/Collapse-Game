@@ -1,14 +1,14 @@
-Collapse - board 4959
+Collapse - board 2082
 Tiles left: 64    Moves: 0
      1  2  3  4  5  6  7  8
- A:  +  x  x  +  x  +  x  x
- B:  x  o  o  o  o  +  +  +
- C:  o  +  o  +  +  +  o  x
- D:  o  +  x  x  +  +  x  o
- E:  x  x  +  x  x  o  x  o
- F:  o  +  x  x  x  o  o  +
- G:  x  x  x  +  o  o  x  x
- H:  x  x  x  x  o  +  o  +
+ A:  +  o  +  x  o  +  o  x
+ B:  +  o  +  x  x  +  x  +
+ C:  +  +  x  o  +  +  +  +
+ D:  +  o  o  o  +  o  o  x
+ E:  x  +  +  +  o  +  +  o
+ F:  x  o  x  +  o  o  x  +
+ G:  o  x  o  +  x  +  o  o
+ H:  x  x  x  o  x  o  x  o
  --------------------------
 1)Restart 2)New Game 3)Select Game 4)Scores 5)Cheat 6)Quit 
 Select Game: Enter desired game number (1 - 5000):

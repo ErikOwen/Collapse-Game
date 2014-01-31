@@ -53,7 +53,7 @@ public class CollapseConsole
      */
     public CollapseConsole()
     {
-        /*try
+        try
         {
             this.boardNum = new Random().nextInt(kNumBoards);
             this.boardPrefSize = getPreferenceSize();
@@ -61,7 +61,7 @@ public class CollapseConsole
         catch(IOException e)
         {
             e.printStackTrace();
-        }*/
+        }
     }
     
     /** Set input/output sources for Stream-based user interfaces.
@@ -80,18 +80,9 @@ public class CollapseConsole
      */
     public void run()
     {
-        this.boardNum = new Random().nextInt(kNumBoards);
-        try
-        {
-            this.boardPrefSize = getPreferenceSize();
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
         this.game = new CollapseGame(this.boardPrefSize, this.boardNum);
-        String userInput;
-        int userChoiceCopy, userChoice = 0;
+        String userInput = "";
+        int userChoice = 0;
         boolean gameOver = false, validMove = false;
         Scanner scan = new Scanner(reader);
 
@@ -102,14 +93,17 @@ public class CollapseConsole
         {   
             try
             {
-                userInput = scan.nextLine().trim();
+                /*Only reads in from scanner if there is a next line*/
+                if(scan.hasNext())
+                {
+                    userInput = scan.nextLine().trim();   
+                }
                 
                 /*If the user only enters one character*/
                 if(userInput.length() == 1)
                 {
                     userChoice = Integer.parseInt(userInput);
                     executeCommand(scan, userChoice);
-                    
                 }
                 /*If the character enters more than one character*/
                 else if(userInput.length() > 1)
@@ -133,8 +127,6 @@ public class CollapseConsole
                         gameOver(scan);
                     }
                 }
-                
-
             }
             catch(Exception e)
             {
@@ -195,13 +187,17 @@ public class CollapseConsole
     
     private void gameOver(Scanner scan) throws IOException
     {
-        String input, name;
+        String input = "", name = "";
 
         writer.write("Game Won Notification: Game " + this.boardNum + " Cleared! \n");
         writer.write("Save your score? (y/n)\n");
         writer.flush();
         
-        input = scan.nextLine().trim().toLowerCase();
+        /*Only reads in from scanner if there is another line*/
+        if(scan.hasNext())
+        {
+            input = scan.nextLine().trim().toLowerCase();   
+        }
         
         /*Determines if user wants to save high score or not*/
         if(input.equals("y"))
@@ -210,8 +206,12 @@ public class CollapseConsole
                 + " will be entered into the Hall of Fame. \n");
             writer.write("Enter your name: \n");
             writer.flush();
-                
-            name = scan.nextLine();
+            
+            /*Only reads in from scanner if there is another line*/
+            if(scan.hasNext())
+            {
+                name = scan.nextLine();
+            }
             
             /*Truncates name if it is more than 20 characters*/
             if(name.length() > kMaxNameLength)
@@ -225,12 +225,18 @@ public class CollapseConsole
     
     private void selectGame(Scanner scan)
     {
-        String boardNumberString;
+        String boardNumberString = "-1";
         int boardNumber;
 
         writer.write("Select Game: Enter desired game number (1 - 5000):\n");
         writer.flush();
-        boardNumberString = scan.nextLine();
+        
+        /*Only reads in from scanner if there is another line*/
+        if(scan.hasNext())
+        {
+            boardNumberString = scan.nextLine();
+        }
+        
         boardNumber = Integer.parseInt(boardNumberString);
         
         /*Makes sure the board number is in the range of 1-5000*/
@@ -305,19 +311,12 @@ public class CollapseConsole
      */
     protected void addHighScore(String name, int score) throws IOException
     {
-        File highScoresDirectory = new File(kHallOfFameDirPath);
         File highScoresFile = new File(kHallOfFamePath);
         boolean createdDir = false, createdFile = false;
 
         /*Creates a high scores file if it does not exist*/
         if(!highScoresFile.exists())
-        {
-            /*Creates the high scores directory if it does not exist*/
-            if(!highScoresDirectory.exists())
-            {
-                createdDir = highScoresDirectory.mkdir();
-            }
-                
+        {       
             createdFile = highScoresFile.createNewFile();
         }
             
