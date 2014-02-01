@@ -89,7 +89,7 @@ public class CollapseConsole
         displayBoardAndOptions();
         
         /*Keep accepting user input until the user's choice is to quit*/
-        while(userChoice != kQuit)
+        while(userChoice != kQuit && scan.hasNext())
         {   
             try
             {
@@ -122,7 +122,7 @@ public class CollapseConsole
                         displayBoardAndOptions();
                     }
                     /*Determines if the game is over*/
-                    if(gameOver)
+                    if(gameOver && validMove)
                     {
                         gameOver(scan);
                     }
