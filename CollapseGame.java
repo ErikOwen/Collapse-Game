@@ -64,7 +64,7 @@ public class CollapseGame
     {
 
         CollapsePiece[] pieces = {CollapsePiece.green, CollapsePiece.purple,
-            CollapsePiece.cyan};
+            CollapsePiece.red};
         java.util.Random generator = new java.util.Random(boardNum);
         
         /*Iterates through each row on the board*/
@@ -86,8 +86,8 @@ public class CollapseGame
                 {
                     characterBoard[row][col] = 'x';
                 }
-                /*If the current tile is cyan, then it sets the char to 'o'*/
-                if(tileBoard[row][col] == CollapsePiece.cyan)
+                /*If the current tile is red, then it sets the char to 'o'*/
+                if(tileBoard[row][col] == CollapsePiece.red)
                 {
                     characterBoard[row][col] = 'o';
                 }

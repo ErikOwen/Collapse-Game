@@ -7,5 +7,5 @@
  */
 public enum CollapsePiece
 {
-    green, purple, cyan, empty
+    green, purple, red, empty
 }
