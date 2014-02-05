@@ -51,7 +51,7 @@ public class CollapseGameTest extends junit.framework.TestCase
         assertEquals(cBoard2[0][0], 'x');
         assertEquals(tBoard2[0][1], CollapsePiece.green);
         assertEquals(cBoard2[0][1], '+');
-        assertEquals(tBoard2[1][0], CollapsePiece.cyan);
+        assertEquals(tBoard2[1][0], CollapsePiece.red);
         assertEquals(cBoard2[1][0], 'o');
         assertEquals(tBoard2[1][1], CollapsePiece.purple);
         assertEquals(cBoard2[1][1], 'x');    

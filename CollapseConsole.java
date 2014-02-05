@@ -14,13 +14,13 @@ public class CollapseConsole
 {
     private static BufferedReader reader;
     private static PrintWriter writer;
-    /*How many hall of fame entries to return */
-    public final static int kHallSize = 5;
-    /*Path to high scores directory*/
-    private final static String kHallOfFameDirPath = "collapse";
-    /*Path to high scores file*/
-    private final static String kHallOfFamePath = "collapse/halloffame.ser";
-    private final static String kPreferencesPath = "collapse/preferences.ini";
+//    /*How many hall of fame entries to return */
+//    public final static int kHallSize = 5;
+//    /*Path to high scores directory*/
+//    private final static String kHallOfFameDirPath = "collapse";
+//    /*Path to high scores file*/
+//    private final static String kHallOfFamePath = "collapse/halloffame.ser";
+//    private final static String kPreferencesPath = "collapse/preferences.ini";
     private final static int kNumBoards = 5000;
     private final static int kRestart = 1;
     private final static int kNewGame = 2;
@@ -56,7 +56,7 @@ public class CollapseConsole
         try
         {
             this.boardNum = new Random().nextInt(kNumBoards);
-            this.boardPrefSize = getPreferenceSize();
+            this.boardPrefSize = Preferences.getPreferenceSize();
         }
         catch(IOException e)
         {
@@ -167,7 +167,7 @@ public class CollapseConsole
             case kScores:
                 //View high scores
                 writer.write("-- High Scores --\n");
-                writer.write(getHighScores());
+                writer.write(HighScores.getHighScores());
                 writer.flush();           
                 break;
             case kCheat:
@@ -219,7 +219,7 @@ public class CollapseConsole
                 name = name.substring(0, kMaxNameLength);
             }
                 
-            this.addHighScore(name, this.game.getNumberOfMoves());
+            HighScores.addHighScore(name, this.game.getNumberOfMoves());
         }
     }
     
@@ -304,93 +304,93 @@ public class CollapseConsole
         writer.flush();
     }
 
-    /** Adds a new high score to the high scores file
-     * 
-     * @param name The name of the score with the high score
-     * @param score The score the player receieved
-     */
-    protected void addHighScore(String name, int score) throws IOException
-    {
-        File highScoresFile = new File(kHallOfFamePath);
-        boolean createdDir = false, createdFile = false;
-
-        /*Creates a high scores file if it does not exist*/
-        if(!highScoresFile.exists())
-        {       
-            createdFile = highScoresFile.createNewFile();
-        }
-            
-        /*Writes to the high score file*/
-        FileWriter highScoreWriter = new FileWriter(highScoresFile, true);
-        highScoreWriter.write(score + " " + name + "\n");
-        highScoreWriter.close();
-    }
+//    /** Adds a new high score to the high scores file
+//     * 
+//     * @param name The name of the score with the high score
+//     * @param score The score the player receieved
+//     */
+//    protected void addHighScore(String name, int score) throws IOException
+//    {
+//        File highScoresFile = new File(kHallOfFamePath);
+//        boolean createdDir = false, createdFile = false;
+//
+//        /*Creates a high scores file if it does not exist*/
+//        if(!highScoresFile.exists())
+//        {       
+//            createdFile = highScoresFile.createNewFile();
+//        }
+//            
+//        /*Writes to the high score file*/
+//        FileWriter highScoreWriter = new FileWriter(highScoresFile, true);
+//        highScoreWriter.write(score + " " + name + "\n");
+//        highScoreWriter.close();
+//    }
+//    
+//    private String parseAndSortHighScores(File highScoresFile) throws IOException
+//    {
+//        String highScoresString = "";
+//        ArrayList<HighScore> scoresList = new ArrayList<HighScore>();
+//        
+//        Scanner scan = new Scanner(highScoresFile);
+//        
+//        /*Reads all of the scores in the high scores file*/
+//        while(scan.hasNextLine())
+//        {
+//            String curLine = scan.nextLine();
+//            scoresList.add(new HighScore(Integer.parseInt(curLine.substring(0,
+//                 curLine.indexOf(" "))), curLine.substring(curLine.indexOf(" ") + 1,
+//                      curLine.length())));
+//        }
+//        
+//        scan.close();
+//        Collections.sort(scoresList, new HighScoreComparator());
+//        
+//        /*Gets the top 5 best scores*/
+//        for(int scoreNdx = 0; scoreNdx < kHallSize && scoreNdx < scoresList.size();
+//            scoreNdx++)
+//        {
+//            HighScore curScore = scoresList.get(scoreNdx);
+//            highScoresString = highScoresString.concat(String.format("%10s",
+//                 curScore.getScore()) + "    " + curScore.getName() + "\n");
+//        }
+//        highScoresString = highScoresString.concat("\n");
+//        return highScoresString;
+//    }
+//    
+//    /** Return a string representation of the top five high scores. 
+//     *  @return string is the top scores, one per line, with the
+//     *  score and name (in that order), separated by one or more blanks.
+//     *  Name is twenty characters max.  Leading blanks are allowed.
+//     */
+//    public String getHighScores()
+//    {
+//        File highScoresFile = new File(kHallOfFamePath);
+//        String highScoresString = "";
+//        
+//        try
+//        {
+//            /*Gets the high scores if the file exists*/
+//            if (highScoresFile.exists())
+//            {
+//                highScoresString = parseAndSortHighScores(highScoresFile);
+//            }
+//        }
+//        catch(Exception e)
+//        {
+//            highScoresString = "";
+//        }
+//        
+//        return highScoresString;
+//    }
     
-    private String parseAndSortHighScores(File highScoresFile) throws IOException
-    {
-        String highScoresString = "";
-        ArrayList<HighScore> scoresList = new ArrayList<HighScore>();
-        
-        Scanner scan = new Scanner(highScoresFile);
-        
-        /*Reads all of the scores in the high scores file*/
-        while(scan.hasNextLine())
-        {
-            String curLine = scan.nextLine();
-            scoresList.add(new HighScore(Integer.parseInt(curLine.substring(0,
-                 curLine.indexOf(" "))), curLine.substring(curLine.indexOf(" ") + 1,
-                      curLine.length())));
-        }
-        
-        scan.close();
-        Collections.sort(scoresList, new HighScoreComparator());
-        
-        /*Gets the top 5 best scores*/
-        for(int scoreNdx = 0; scoreNdx < kHallSize && scoreNdx < scoresList.size();
-            scoreNdx++)
-        {
-            HighScore curScore = scoresList.get(scoreNdx);
-            highScoresString = highScoresString.concat(String.format("%10s",
-                 curScore.getScore()) + "    " + curScore.getName() + "\n");
-        }
-        highScoresString = highScoresString.concat("\n");
-        return highScoresString;
-    }
-    
-    /** Return a string representation of the top five high scores. 
-     *  @return string is the top scores, one per line, with the
-     *  score and name (in that order), separated by one or more blanks.
-     *  Name is twenty characters max.  Leading blanks are allowed.
-     */
-    public String getHighScores()
-    {
-        File highScoresFile = new File(kHallOfFamePath);
-        String highScoresString = "";
-        
-        try
-        {
-            /*Gets the high scores if the file exists*/
-            if (highScoresFile.exists())
-            {
-                highScoresString = parseAndSortHighScores(highScoresFile);
-            }
-        }
-        catch(Exception e)
-        {
-            highScoresString = "";
-        }
-        
-        return highScoresString;
-    }
-    
-    private int getPreferenceSize() throws IOException
-    {   
-        Ini ini = new Ini();
-        
-        ini.load(new FileReader(new File(kPreferencesPath)));
-        Ini.Section section = ini.get("Board Size");
-        int prefSize = Integer.parseInt(section.get("small"));
-        
-        return prefSize;
-    }
+//    private int getPreferenceSize() throws IOException
+//    {   
+//        Ini ini = new Ini();
+//        
+//        ini.load(new FileReader(new File(kPreferencesPath)));
+//        Ini.Section section = ini.get("Board Size");
+//        int prefSize = Integer.parseInt(section.get("small"));
+//        
+//        return prefSize;
+//    }
 }

@@ -2,7 +2,9 @@ import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.net.URL;
+import java.util.Random;
 
 
 /**  Skeleton GUI for grid-based games. 
@@ -12,30 +14,33 @@ import java.net.URL;
 * @author JD 
 * @version 2014.1.12
 */
-public class GUIskeleton extends JFrame 
+public class CollapseGameGUI extends JFrame 
 {
 
-    /* Main components of the GUI */
-    private Object[][] myBoard; 
-    private String[] columns = {"","","","","","","","","","",};
-    private JLabel myStatus = null;
+    /* Main components of the GUI */ 
+    private JLabel gameStatus = null;
     private JMenuBar menuBar;
     private JTable table;
+    private GameTableModel model;
     private int clickCount;
-    /* Square dimensions */
-    private int TileWidth = 100;
-    private int TileHeight = 50;
+    /* Tile dimensions */
+    private int TileWidth = 75;
+    private int TileHeight = 55;
     private ImageIcon [] images = new ImageIcon[10];
     private CollapseGame game;
+    private int boardPrefSize, boardNum;
+    private final static int kNumBoards = 5000;
 
     /** Create a GUI.
      * Will use the System Look and Feel when possible.
      */
-    public GUIskeleton(CollapseGame game)
+    public CollapseGameGUI() throws IOException
     {
         super();
-        this.game = game;
-        myBoard = new Integer[game.getTileBoard().length][game.getTileBoard()[0].length];
+        
+        this.boardNum = new Random().nextInt(kNumBoards);
+        this.game = new CollapseGame(Preferences.getPreferenceSize(), this.boardNum);
+        
         try
         {
             UIManager.setLookAndFeel(
@@ -54,20 +59,9 @@ public class GUIskeleton extends JFrame
     public void layoutGUI()
     {
         loadImages();
-        //newGame();
-        table = new JTable(new GameTableModel(game)); 
+        this.model = new GameTableModel(game);
+        this.table = new JTable(model); 
         
-        TableColumn column = null;
-        if (myBoard != null)
-        {
-            // Set the dimensions for each column in the board to match the image */
-            for (int i = 0; i < game.getTileBoard()[0].length; i++)
-            {
-                column = table.getColumnModel().getColumn(i);
-                column.setMaxWidth(TileWidth);
-                column.setMinWidth(TileWidth);
-            }
-        }
         table.setDefaultEditor(Object.class, null);  // remove editor makes table not editable
         table.setDefaultRenderer(CollapsePiece.class, new GameCellRenderer(images));
         
@@ -108,8 +102,8 @@ public class GUIskeleton extends JFrame
         
         // Create a panel for the status information
         JPanel statusPane = new JPanel();
-        myStatus = new JLabel("###");
-        statusPane.add(myStatus);
+        gameStatus = new JLabel("Tiles left: " + game.getTilesLeft() + "\t\tMoves: " + game.getNumberOfMoves());
+        statusPane.add(gameStatus);
         statusPane.setAlignmentX(Component.CENTER_ALIGNMENT);
         getContentPane().add(statusPane);
 
@@ -131,20 +125,16 @@ public class GUIskeleton extends JFrame
             {
                 int col = table.getSelectedColumn();
                 int row = table.getSelectedRow();
-                // Is it a right mouse click?
-                if (SwingUtilities.isRightMouseButton(ev)) 
+                // Is it a left mouse click?
+                if (SwingUtilities.isLeftMouseButton(ev)) 
                 {
                     row = (int) (ev.getPoint().getY()/TileHeight);
                     col = (int) (ev.getPoint().getX()/TileWidth);
-                    // Turn the value negative
-                    myBoard[row][col] = -(Integer) myBoard[row][col];
-                }
-                else
-                {
-                    // left mouse clicks turn the value to zero
-                    myBoard[row][col] = 0;
-                    clickCount++;
-                    myStatus.setText("" + clickCount);
+                    System.out.println("Clicked X: " + ev.getPoint().getX() + ", " + "Clicked Y: " + ev.getPoint().getY());
+                    System.out.println("Row: " + row + ", Column: " + col);
+                    game.takeTurn(row, col);
+                    //clickCount++;
+                    gameStatus.setText("Tiles left: " + game.getTilesLeft() + "\t\tMoves: " + game.getNumberOfMoves());
                 }
                 repaint();
             }
@@ -154,8 +144,7 @@ public class GUIskeleton extends JFrame
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
    
 
-    } // end layout
-
+    }
     
     protected void loadImages()
     {
@@ -177,28 +166,27 @@ public class GUIskeleton extends JFrame
     /** Start a new game by putting new values in the board */
     private void newGame()
     {
-        Integer cellvalue = new Integer((int)(Math.random()*10));
-        for (int i=0;i<10;i++)
-        {
-            for (int j=0;j<10;j++)
-            {
-                myBoard[i][j] = cellvalue;
-            }
-        }
-        clickCount = 0;
+        //Logic for new game goes here
     }
     
     // Local main to launch the GUI
     public static void main(String[] args)
     {
+    	try
+    	{
         // Create the GUI 
-    	CollapseGame game = new CollapseGame(8, 2);
-        GUIskeleton frame = new GUIskeleton(game);
+        CollapseGameGUI frame = new CollapseGameGUI();
 
         frame.layoutGUI();   // do the layout of widgets
                
         // Make the GUI visible and available for user interaction
         frame.pack();
         frame.setVisible(true);
+    	}
+    	catch(IOException e)
+    	{
+    		e.printStackTrace();
+    		System.out.println("Error reading from preferences file.");
+    	}
     }
-}  // end class
+}
