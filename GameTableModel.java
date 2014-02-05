@@ -9,13 +9,6 @@ public class GameTableModel extends AbstractTableModel
     public GameTableModel(CollapseGame game)
     {
         gameBoard = game.getTileBoard();
-        /*for (int colIdx = 0; colIdx < gameBoard.length; colIdx++)
-        {
-            for (int rowIdx = 0; rowIdx < gameBoard[0].length; rowIdx++)
-            {
-                gameBoard[colIdx][rowIdx] = Lights.getRandom();
-            }
-        }*/
     }
 
     public int getColumnCount()

@@ -21,8 +21,8 @@ public class CollapseGameGUI extends JFrame
     private JLabel gameStatus = null;
     private JMenuBar menuBar;
     private JTable table;
+    private JPanel statusPane;
     private GameTableModel model;
-    private int clickCount;
     /* Tile dimensions */
     private int TileWidth = 75;
     private int TileHeight = 55;
@@ -39,8 +39,9 @@ public class CollapseGameGUI extends JFrame
         super();
         
         this.boardNum = new Random().nextInt(kNumBoards);
-        this.game = new CollapseGame(Preferences.getPreferenceSize(), this.boardNum);
-        
+        this.boardPrefSize = Preferences.getPreferenceSize();
+        this.game = new CollapseGame(this.boardPrefSize, this.boardNum);
+        super.setTitle("Collapse - board " + this.boardNum);
         try
         {
             UIManager.setLookAndFeel(
@@ -60,7 +61,37 @@ public class CollapseGameGUI extends JFrame
     {
         loadImages();
         this.model = new GameTableModel(game);
-        this.table = new JTable(model); 
+        this.table = new JTable(model)
+        {
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int column)
+            {
+            	Component c = super.prepareRenderer(renderer, row, column);
+            	
+            	if( c instanceof JComponent )
+            	{	
+            		((JComponent)c).setOpaque(false);
+            	}
+            	return c;
+            }
+            
+            String file = "icons/" + "background.png";
+            URL backgroundUrl = getClass().getResource(file);
+            ImageIcon backgroundIcon = new ImageIcon(backgroundUrl);
+            //Image scaled = original.getImage().getScaledInstance(TileWidth, TileHeight, Image.SCALE_DEFAULT);
+            //ImageIcon backgroundIcon = new ImageIcon(scaled);
+            
+            
+            //String url = "https://mediacru.sh/DJPai-Ixkvfp.jpg";
+            // Be patient, takes about ten seconds to load the URL
+            //ImageIcon background = new ImageIcon(ImageIO.read(new URL(url)));
+            // Override paint so as to show the table background
+            public void paint(Graphics g)
+            {
+            	g.drawImage(backgroundIcon.getImage(), 0, 0, null, null);
+            	// Now let the paint do its usual work
+            	super.paint(g);
+            }
+        };
         
         table.setDefaultEditor(Object.class, null);  // remove editor makes table not editable
         table.setDefaultRenderer(CollapsePiece.class, new GameCellRenderer(images));
@@ -72,24 +103,98 @@ public class CollapseGameGUI extends JFrame
         menuBar = new javax.swing.JMenuBar();
         JMenu mnuGame = new JMenu("Game");
         menuBar.add(mnuGame);
+        
+        JMenuItem mnuRestart = new JMenuItem("Restart");
+        mnuRestart.setAccelerator(KeyStroke.getKeyStroke('R', ActionEvent.ALT_MASK));
+        mnuRestart.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+            	newGame(boardNum);
+            }
+        });
+        mnuGame.add(mnuRestart);
+        
         JMenuItem mnuNew = new JMenuItem("New");
-        mnuNew.setMnemonic('N');
-        mnuNew.setAccelerator(
-                KeyStroke.getKeyStroke('N', ActionEvent.ALT_MASK));
+        mnuNew.setAccelerator(KeyStroke.getKeyStroke('N', ActionEvent.ALT_MASK));
         mnuNew.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
             {
-                newGame();
-                repaint();                
+            	if(boardNum == 5000)
+            	{
+            		boardNum = 1;
+            	}
+            	else
+            	{
+            		boardNum++;
+            	}
+                newGame(boardNum);           
             }
         });
         mnuGame.add(mnuNew);
         
+        JMenuItem mnuSelectGame = new JMenuItem("Select Game");
+        mnuSelectGame.setAccelerator(KeyStroke.getKeyStroke('G', ActionEvent.ALT_MASK));
+        mnuSelectGame.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                String gameNumString = JOptionPane.showInputDialog(
+                    null,
+                    "Enter desired game number (1 - 5000)",
+                    "Select Game",
+                    JOptionPane.QUESTION_MESSAGE
+                );
+                
+                if(gameNumString != null)
+                {
+                	try
+                	{
+                		int gameNum = Integer.parseInt(gameNumString);
+                		boardNum = gameNum;
+                		newGame(boardNum); 
+                	}
+                	catch(NumberFormatException nfe)
+                	{
+                		
+                	}
+                }          
+            }
+        });
+        mnuGame.add(mnuSelectGame);
+        
+        JMenuItem mnuScores = new JMenuItem("Scores");
+        mnuScores.setAccelerator(KeyStroke.getKeyStroke('S', ActionEvent.ALT_MASK));
+        mnuScores.addActionListener(new ActionListener()
+        {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(
+					null,
+		            HighScores.getHighScores(),
+		            "Hall of Fame",
+		            JOptionPane.PLAIN_MESSAGE
+		        );
+				
+			}
+        	
+        });
+        mnuGame.add(mnuScores);
+        
+        JMenuItem mnuCheat = new JMenuItem("Cheat");
+        mnuCheat.setAccelerator(KeyStroke.getKeyStroke('C', ActionEvent.ALT_MASK));
+        mnuCheat.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                game.cheat();
+                repaint();
+            }
+        });
+        mnuGame.add(mnuCheat);
+        
         JMenuItem mnuQuit = new JMenuItem("Quit");
-        mnuQuit.setMnemonic('Q');
-        mnuQuit.setAccelerator(
-                KeyStroke.getKeyStroke('Q', ActionEvent.ALT_MASK));
+        mnuQuit.setAccelerator(KeyStroke.getKeyStroke('Q', ActionEvent.ALT_MASK));
         mnuQuit.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
@@ -101,7 +206,7 @@ public class CollapseGameGUI extends JFrame
         setJMenuBar(menuBar);        
         
         // Create a panel for the status information
-        JPanel statusPane = new JPanel();
+        statusPane = new JPanel();
         gameStatus = new JLabel("Tiles left: " + game.getTilesLeft() + "\t\tMoves: " + game.getNumberOfMoves());
         statusPane.add(gameStatus);
         statusPane.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -111,7 +216,7 @@ public class CollapseGameGUI extends JFrame
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setCellSelectionEnabled(false);
         table.setRowHeight(TileHeight);
-
+        
         table.setOpaque(false);
         table.setShowGrid(false);
 
@@ -130,16 +235,29 @@ public class CollapseGameGUI extends JFrame
                 {
                     row = (int) (ev.getPoint().getY()/TileHeight);
                     col = (int) (ev.getPoint().getX()/TileWidth);
-                    System.out.println("Clicked X: " + ev.getPoint().getX() + ", " + "Clicked Y: " + ev.getPoint().getY());
-                    System.out.println("Row: " + row + ", Column: " + col);
-                    game.takeTurn(row, col);
-                    //clickCount++;
-                    gameStatus.setText("Tiles left: " + game.getTilesLeft() + "\t\tMoves: " + game.getNumberOfMoves());
+                    //System.out.println("Clicked X: " + ev.getPoint().getX() + ", " + "Clicked Y: " + ev.getPoint().getY());
+                    //System.out.println("Row: " + row + ", Column: " + col);
+                    selectCell(row, col);
                 }
                 repaint();
             }
         }
         );
+        
+        table.addKeyListener(new KeyAdapter()
+        {
+            public void keyPressed(KeyEvent e)
+            {
+                int keyCode = e.getKeyCode();
+                if (keyCode == KeyEvent.VK_SPACE)
+                {
+                    int col = table.getSelectedColumn();
+                    int row = table.getSelectedRow();
+                    selectCell(row, col);
+                }
+                repaint();
+            }
+        });
         
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
    
@@ -163,10 +281,60 @@ public class CollapseGameGUI extends JFrame
         }
     }
 
+    private void selectCell(int row, int col)
+    {	
+        boolean validMove = game.takeTurn(row, col);
+        gameStatus.setText("Tiles left: " + game.getTilesLeft() + "\t\tMoves: " + game.getNumberOfMoves());
+        
+        if(game.isGameOver() && validMove)
+        {
+            String choice = JOptionPane.showInputDialog(
+                this,
+                "Game " + this.boardNum + " Cleared!\nSave your score? (y/n)",
+                "Select Game",
+                JOptionPane.QUESTION_MESSAGE
+            	);
+            if(choice != null && choice.toLowerCase().trim().equals("y"))
+            {
+                String name = JOptionPane.showInputDialog(
+                	this,
+                    "Your score of " + game.getNumberOfMoves() + " will be entered into the Hall of Fame.\nEnter your name:",
+                    "Hall of Fame Entry",
+                    JOptionPane.QUESTION_MESSAGE
+                    );
+                if(name != null)
+                {
+                	try
+                	{
+                		HighScores.addHighScore(name, game.getNumberOfMoves());
+                	}
+                	catch(IOException e)
+                	{
+                		e.printStackTrace();
+                	}
+                }
+            }
+        }
+    }
+    
     /** Start a new game by putting new values in the board */
-    private void newGame()
+    private void newGame(int gameNum)
     {
-        //Logic for new game goes here
+    	//getContentPane().remove(table);
+        this.game = new CollapseGame(this.boardPrefSize, gameNum);
+        super.setTitle("Collapse - board " + this.boardNum);
+        gameStatus = new JLabel("Tiles left: " + game.getTilesLeft() + "\t\tMoves: " + game.getNumberOfMoves());
+        this.statusPane.removeAll();
+        this.statusPane.add(gameStatus);
+        this.statusPane.revalidate();
+        this.statusPane.repaint();
+        
+        this.model = new GameTableModel(game);
+        this.table.setModel(model);
+        
+        repaint();
+        
+        
     }
     
     // Local main to launch the GUI
@@ -174,14 +342,14 @@ public class CollapseGameGUI extends JFrame
     {
     	try
     	{
-        // Create the GUI 
-        CollapseGameGUI frame = new CollapseGameGUI();
-
-        frame.layoutGUI();   // do the layout of widgets
+    		// Create the GUI 
+        	CollapseGameGUI frame = new CollapseGameGUI();
+        	
+        	frame.layoutGUI();   // do the layout of widgets
                
-        // Make the GUI visible and available for user interaction
-        frame.pack();
-        frame.setVisible(true);
+        	// Make the GUI visible and available for user interaction
+        	frame.pack();
+        	frame.setVisible(true);
     	}
     	catch(IOException e)
     	{
