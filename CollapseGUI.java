@@ -14,7 +14,7 @@ import java.util.Random;
 * @author JD 
 * @version 2014.1.12
 */
-public class CollapseGameGUI extends JFrame 
+public class CollapseGUI extends JFrame 
 {
 
     /* Main components of the GUI */ 
@@ -34,7 +34,7 @@ public class CollapseGameGUI extends JFrame
     /** Create a GUI.
      * Will use the System Look and Feel when possible.
      */
-    public CollapseGameGUI() throws IOException
+    public CollapseGUI() throws IOException
     {
         super();
         
@@ -57,7 +57,7 @@ public class CollapseGameGUI extends JFrame
     /** Place all the Swing widgets in the frame of this GUI.
      * @post the GUI is visible.  
      */
-    public void layoutGUI()
+    public void run()
     {
         loadImages();
         this.model = new GameTableModel(game);
@@ -343,9 +343,9 @@ public class CollapseGameGUI extends JFrame
     	try
     	{
     		// Create the GUI 
-        	CollapseGameGUI frame = new CollapseGameGUI();
+        	CollapseGUI frame = new CollapseGUI();
         	
-        	frame.layoutGUI();   // do the layout of widgets
+        	frame.run();   // do the layout of widgets
                
         	// Make the GUI visible and available for user interaction
         	frame.pack();
